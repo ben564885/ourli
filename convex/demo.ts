@@ -208,8 +208,8 @@ export const clearCreatorAvatars = internalMutation({
 
 const KEEP = ["Philip", "Ayush", "Daniel"];
 const EXTRA = [
-  { name: "Roommates", code: "ROOM2", color: "#FF9EB5", icon: "home", members: ["Ben", "Ayush", "Daniel"] },
-  { name: "College crew", code: "COLL3", color: "#8FE0B0", icon: "school", members: ["Ben", "Philip", "Ayush"] },
+  { name: "Roommates", code: "ROOM2", color: "#FF9EB5", icon: "home", members: ["Ben", "Ayush", "Daniel", "Philip"] },
+  { name: "College crew", code: "COLL3", color: "#8FE0B0", icon: "school", members: ["Ben", "Philip", "Ayush", "Daniel"] },
 ];
 
 async function demoGroups(ctx: { db: any }) {
@@ -363,5 +363,32 @@ export const clearRange = internalMutation({
       }
     }
     return "cleared " + n;
+  },
+});
+
+export const fillCrews = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const main = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!main) return "no group";
+    const byName = new Map<string, Id<"users">>();
+    for (const m of await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", main._id)).collect()) {
+      const u = await ctx.db.get(m.userId);
+      if (u) byName.set(u.name, u._id);
+    }
+    let n = 0;
+    for (const e of EXTRA) {
+      const gr = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", e.code)).unique();
+      if (!gr) continue;
+      const have = new Set((await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", gr._id)).collect()).map((m) => m.userId));
+      for (const name of e.members) {
+        const uid = byName.get(name);
+        if (uid && !have.has(uid)) {
+          await ctx.db.insert("groupMembers", { groupId: gr._id, userId: uid });
+          n++;
+        }
+      }
+    }
+    return "added " + n;
   },
 });

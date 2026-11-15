@@ -8,7 +8,7 @@ import { useSession } from "@/lib/session";
 import { useNow } from "@/lib/use-now";
 import { dayClock, formatCountdown, hourLabel } from "@/lib/time";
 import { C, F } from "@/lib/theme";
-import { Body, Button, H1, Loading, Pill, Screen } from "@/components/ui";
+import { Button, H1, Loading, Pill, Screen } from "@/components/ui";
 import { HourReveal } from "@/components/hour-reveal";
 
 export default function DayScreen() {
@@ -32,15 +32,16 @@ export default function DayScreen() {
     <Screen>
       <Button title="← Home" variant="ghost" style={{ alignSelf: "flex-start", height: 36, paddingHorizontal: 0 }} onPress={() => router.replace("/")} />
       {day.type === "creator" && <Pill text={"Creator Day with " + (day.creator?.name ?? "")} color={C.whop} />}
-      <H1>{title}</H1>
-      <Body muted>
-        {clock.ended
-          ? "This Day is over. Here's how it went."
-          : clock.notStarted
-            ? "Starts at " + hourLabel(day.startHour) + " · in " + formatCountdown(clock.msLeft)
-            : hourLabel(day.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + day.hourCount + " · " + formatCountdown(clock.msLeft) + " left"}
-      </Body>
-
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <H1 style={{ flexShrink: 0 }}>{title}</H1>
+        <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6} style={{ flex: 1, textAlign: "right", color: C.muted, fontFamily: F.sans, fontSize: 14 }}>
+          {clock.ended
+            ? "Day is over"
+            : clock.notStarted
+              ? hourLabel(day.startHour) + " · in " + formatCountdown(clock.msLeft)
+              : hourLabel(day.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + day.hourCount + " · " + formatCountdown(clock.msLeft) + " left"}
+        </Text>
+      </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
         {Array.from({ length: day.hourCount }, (_, i) => {
           const future = !clock.ended && i > clock.current;
