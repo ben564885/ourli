@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import * as Haptics from "expo-haptics";
 import { ActivityIndicator, Platform, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -32,6 +33,11 @@ export default function Capture() {
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const cam = useRef<CameraView>(null);
+  const lastTap = useRef(0);
+  const flip = () => {
+    Haptics.selectionAsync();
+    setFacing((f) => (f === "back" ? "front" : "back"));
+  };
   const now = useNow();
   const idx = Number(hourIndex);
 
@@ -83,7 +89,15 @@ export default function Capture() {
       {preview ? (
         <Photo uri={preview} style={{ flex: 1, borderRadius: 0 }} />
       ) : useLiveCamera && perm?.granted ? (
-        <CameraView ref={cam} style={{ flex: 1 }} facing={facing} />
+        <Pressable
+          style={{ flex: 1 }}
+          onPress={() => {
+            const t = Date.now();
+            if (t - lastTap.current < 300) flip();
+            lastTap.current = t;
+          }}>
+          <CameraView ref={cam} style={{ flex: 1 }} facing={facing} />
+        </Pressable>
       ) : (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 32, gap: 16 }}>
           <Text style={{ color: C.text, fontSize: 22, fontWeight: "800", textAlign: "center" }}>What does your {status ? "hour" : "day"} look like?</Text>
@@ -100,9 +114,7 @@ export default function Capture() {
           <View style={{ backgroundColor: "rgba(0,0,0,0.5)", borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 }}>
             <Text style={{ color: "#fff", fontWeight: "700" }}>{status}</Text>
           </View>
-          <Pressable accessibilityLabel="Flip camera" onPress={() => setFacing((f) => (f === "back" ? "front" : "back"))}>
-            <Text style={{ color: "#fff", fontSize: 22 }}>⟲</Text>
-          </Pressable>
+          <View style={{ width: 28 }} />
         </View>
       </SafeAreaView>
 
@@ -126,7 +138,11 @@ export default function Capture() {
                 }}
                 style={{ width: 78, height: 78, borderRadius: 39, borderWidth: 5, borderColor: "#fff", backgroundColor: "rgba(255,255,255,0.25)" }}
               />
-              <View style={{ width: 60 }} />
+              <Pressable accessibilityLabel="Flip camera" testID="flip-camera" onPress={flip} style={{ width: 60, alignItems: "flex-end" }}>
+                <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: "rgba(255,255,255,0.22)", alignItems: "center", justifyContent: "center" }}>
+                  <Ionicons name="camera-reverse-outline" size={26} color="#fff" />
+                </View>
+              </Pressable>
             </>
           ) : null}
         </View>
