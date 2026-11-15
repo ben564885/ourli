@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -7,11 +8,13 @@ import { C, F, R } from "@/lib/theme";
 export function Screen({ children, scroll = true, style }: { children: ReactNode; scroll?: boolean; style?: ViewStyle }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["top", "left", "right"]}>
+      <Animated.View entering={FadeInDown.duration(320).springify().damping(18)} style={{ flex: 1 }}>
       {scroll ? (
         <ScrollView contentContainerStyle={[{ padding: 20, paddingBottom: 60, gap: 16 }, style]}>{children}</ScrollView>
       ) : (
         <View style={[{ flex: 1, padding: 20, gap: 16 }, style]}>{children}</View>
       )}
+      </Animated.View>
     </SafeAreaView>
   );
 }

@@ -19,9 +19,12 @@ export default function RootLayout() {
       <SessionProvider>
         <SafeAreaProvider>
           <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="capture/[dayId]" options={{ presentation: "fullScreenModal", animation: "fade" }} />
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg }, animation: "slide_from_right", animationDuration: 300, gestureEnabled: true }}>
+            <Stack.Screen name="(tabs)" options={{ animation: "fade", animationDuration: 250 }} />
+            <Stack.Screen name="welcome" options={{ animation: "fade_from_bottom" }} />
+            <Stack.Screen name="photo/[captureId]" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+            <Stack.Screen name="c/[code]" options={{ animation: "fade_from_bottom" }} />
+            <Stack.Screen name="capture/[dayId]" options={{ presentation: "fullScreenModal", animation: "slide_from_bottom" }} />
           </Stack>
         </SafeAreaProvider>
       </SessionProvider>

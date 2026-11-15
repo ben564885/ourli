@@ -17,6 +17,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        animation: "fade",
         tabBarActiveTintColor: C.text,
         tabBarInactiveTintColor: C.faint,
         tabBarLabelStyle: { fontFamily: F.sansMedium, fontSize: 11 },

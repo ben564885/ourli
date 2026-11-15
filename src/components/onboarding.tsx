@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Animated2, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -84,6 +85,7 @@ export function Onboarding() {
           <Text style={s.sub}>{step === "intro" ? "No filters. Just your hours, together." : step === "code" ? "Your name, then the code your friend sent." : "What should your friends call you?"}</Text>
         </View>
 
+        <Animated2.View key={step} entering={FadeIn.duration(300)} exiting={FadeOut.duration(120)}>
         {step === "intro" ? (
           <View style={{ gap: 14, marginTop: 44 }}>
             <Marquee chips={ROWS[0]} duration={26000} />
@@ -98,6 +100,7 @@ export function Onboarding() {
             )}
           </View>
         )}
+        </Animated2.View>
 
         <View style={{ flex: 1 }} />
         <View style={{ paddingHorizontal: 24, paddingBottom: 12, gap: 6 }}>
