@@ -105,9 +105,9 @@ export default function Calendar() {
     scroll.current?.scrollTo({ y: Math.max(0, month + today - 150), animated });
   };
   const goBottom = () => {
-    const { month, monthH, viewH } = pos.current;
-    if (month < 0 || !monthH || !viewH || pos.current.done) return;
-    scroll.current?.scrollTo({ y: Math.max(0, month + monthH - viewH + 124), animated: false });
+    const { month, today, viewH } = pos.current;
+    if (month < 0 || today < 0 || !viewH || pos.current.done) return;
+    scroll.current?.scrollTo({ y: Math.max(0, month + today + cell + 12 - viewH + 132), animated: false });
     pos.current.done = true;
   };
   if (!userId) return null;
@@ -140,7 +140,7 @@ export default function Calendar() {
               cell={cell}
               userId={userId}
               groupId={groupId as Id<"groups"> | undefined}
-              onToday={i === 2 ? (y) => { pos.current.today = y; } : undefined}
+              onToday={i === 2 ? (y) => { pos.current.today = y; goBottom(); } : undefined}
             />
           </View>
         ))}
