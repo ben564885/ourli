@@ -73,6 +73,7 @@ http.route({
           redirect_uri: callbackUrl(),
           client_id: process.env.WHOP_CLIENT_ID,
           code_verifier: row.codeVerifier,
+          ...(process.env.WHOP_CLIENT_SECRET ? { client_secret: process.env.WHOP_CLIENT_SECRET } : {}),
         }),
       });
       if (!tokenRes.ok) throw new Error("token " + tokenRes.status + " " + (await tokenRes.text()));
