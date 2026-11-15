@@ -16,7 +16,6 @@ import { Loading, Logo } from "@/components/ui";
 const SITE = process.env.EXPO_PUBLIC_CONVEX_SITE_URL!;
 const WEB = process.env.EXPO_PUBLIC_WEB_URL;
 const PASS_URL = "https://whop.com/checkout/plan_CP6L8nLZEpYib";
-const CREATOR_PHOTO = require("../../../assets/images/creator.jpg");
 const PAPER = C.cardHi;
 
 const MESSAGES: Record<string, string> = {
@@ -50,6 +49,7 @@ export default function CreatorJoin() {
   const code = params.code.toUpperCase();
   const { userId, setUserId, loading } = useSession();
   const day = useQuery(api.days.byJoinCode, { joinCode: code });
+  const previews = useQuery(api.creators.previewByCode, { joinCode: code });
   const membership = useQuery(api.creator.membership, day && userId ? { dayId: day._id, userId } : "skip");
   const whop = useQuery(api.creator.whopConfigured);
   const createUser = useMutation(api.users.create);
@@ -137,7 +137,7 @@ export default function CreatorJoin() {
             <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
               {[0, 1, 2].map((i) => (
                 <View key={i} style={{ width: tile, height: tile * 1.15, borderRadius: 22, overflow: "hidden" }}>
-                  <Image source={CREATOR_PHOTO} style={{ width: "100%", height: "100%" }} contentFit="cover" contentPosition={i === 0 ? "left top" : i === 1 ? "center" : "right center"} />
+                  {previews?.[i] ? <Image source={{ uri: previews[i] }} style={{ width: "100%", height: "100%" }} contentFit="cover" blurRadius={i === 0 ? 0 : 40} /> : <View style={{ flex: 1, backgroundColor: C.cardHi }} />}
                   <View style={{ position: "absolute", top: 6, right: 6, backgroundColor: "#fff", borderRadius: 999, paddingHorizontal: 6, paddingVertical: 2 }}>
                     <Text style={{ fontFamily: F.sansMedium, fontSize: 9, color: C.text }}>{hourLabel(day.startHour + i)}</Text>
                   </View>

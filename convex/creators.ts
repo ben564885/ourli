@@ -33,6 +33,18 @@ export const feed = query({
   },
 });
 
+export const previewByCode = query({
+  args: { joinCode: v.string() },
+  handler: async (ctx, { joinCode }) => {
+    const day = await ctx.db.query("days").filter((q) => q.eq(q.field("joinCode"), joinCode.toUpperCase())).first();
+    if (!day) return null;
+    const caps = await ctx.db.query("captures").withIndex("by_day", (q) => q.eq("dayId", day._id)).collect();
+    const theirs = caps.filter((c) => c.userId === day.creatorId).sort((a, b) => a.hourIndex - b.hourIndex);
+    const urls = await Promise.all(theirs.slice(0, 3).map((c) => ctx.storage.getUrl(c.storageId)));
+    return urls.filter((u): u is string => !!u);
+  },
+});
+
 const CREATORS = [
   { name: "Maya", code: "MAYA1", title: "A Day with Maya", color: "#FF8FAB" },
   { name: "Jordan", code: "JORD2", title: "Studio Day with Jordan", color: "#6BC5FF" },
