@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
-import { C, R } from "@/lib/theme";
+import { C, F, R } from "@/lib/theme";
 
 export function Screen({ children, scroll = true, style }: { children: ReactNode; scroll?: boolean; style?: ViewStyle }) {
   return (
@@ -30,8 +30,8 @@ export function Body({ children, style, muted }: { children: ReactNode; style?: 
 
 export function Logo({ size = 34 }: { size?: number }) {
   return (
-    <Text style={{ fontSize: size, fontWeight: "800", color: C.text, letterSpacing: -1 }}>
-      <Text style={{ color: C.accentSoft }}>our</Text>li
+    <Text style={{ fontSize: size, fontFamily: F.sansBold, color: C.text, letterSpacing: -1 }}>
+      <Text style={{ fontFamily: F.serifItalic, fontWeight: "400" }}>our</Text>li
     </Text>
   );
 }
@@ -62,7 +62,7 @@ export function Button({
       onPress={onPress}
       disabled={disabled || loading}
       style={({ pressed }) => [s.btn, { backgroundColor: bg, opacity: disabled ? 0.4 : pressed ? 0.8 : 1 }, style]}>
-      {loading ? <ActivityIndicator color="#fff" /> : <Text style={[s.btnText, variant === "ghost" && { color: C.accentSoft }]}>{title}</Text>}
+      {loading ? <ActivityIndicator color={variant === "secondary" || variant === "ghost" ? C.text : "#fff"} /> : <Text style={[s.btnText, (variant === "ghost" || variant === "secondary") && { color: C.text }]}>{title}</Text>}
     </Pressable>
   );
 }
@@ -80,7 +80,7 @@ export function Card({ children, style, onPress }: { children: ReactNode; style?
 export function Avatar({ name, color, size = 36 }: { name: string; color: string; size?: number }) {
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, alignItems: "center", justifyContent: "center" }}>
-      <Text style={{ color: "#15151C", fontWeight: "800", fontSize: size * 0.42 }}>{name.slice(0, 1).toUpperCase()}</Text>
+      <Text style={{ color: "#111", fontFamily: F.sansBold, fontSize: size * 0.42 }}>{name.slice(0, 1).toUpperCase()}</Text>
     </View>
   );
 }
@@ -101,16 +101,16 @@ export function Loading() {
 export function Pill({ text, color = C.accent }: { text: string; color?: string }) {
   return (
     <View style={{ alignSelf: "flex-start", backgroundColor: color, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-      <Text style={{ color: "#fff", fontSize: 12, fontWeight: "700" }}>{text}</Text>
+      <Text style={{ color: "#fff", fontSize: 12, fontFamily: F.sansBold }}>{text}</Text>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  h1: { color: C.text, fontSize: 34, fontWeight: "800", letterSpacing: -0.5 },
-  h2: { color: C.text, fontSize: 20, fontWeight: "700" },
-  body: { color: C.text, fontSize: 15, lineHeight: 21 },
-  btn: { height: 52, borderRadius: 16, alignItems: "center", justifyContent: "center", paddingHorizontal: 18 },
-  btnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
-  card: { backgroundColor: C.card, borderRadius: 20, padding: 16, gap: 10 },
+  h1: { color: C.text, fontSize: 36, fontFamily: F.sansBold, letterSpacing: -1 },
+  h2: { color: C.text, fontSize: 21, fontFamily: F.sansBold, letterSpacing: -0.3 },
+  body: { color: C.text, fontSize: 15, lineHeight: 21, fontFamily: F.sans },
+  btn: { height: 56, borderRadius: 999, alignItems: "center", justifyContent: "center", paddingHorizontal: 22 },
+  btnText: { color: "#fff", fontSize: 16, fontFamily: F.sansBold },
+  card: { backgroundColor: C.card, borderRadius: 24, padding: 16, gap: 10 },
 });

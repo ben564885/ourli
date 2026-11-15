@@ -37,9 +37,9 @@ export default function GroupScreen() {
       </View>
 
       {group.activeDay ? (
-        <Card style={{ backgroundColor: C.accent }} onPress={() => router.push(("/day/" + group.activeDay!._id) as any)}>
-          <Text style={{ color: "#fff", fontSize: 18, fontWeight: "800" }}>A Day is live</Text>
-          <Text style={{ color: "#fff" }}>Open it to snap this hour →</Text>
+        <Card style={{ backgroundColor: C.sky, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.skyLine }} onPress={() => router.push(("/day/" + group.activeDay!._id) as any)}>
+          <Text style={{ color: C.text, fontSize: 19, fontWeight: "700" }}>A Day is live</Text>
+          <Text style={{ color: C.muted }}>Open it to snap this hour →</Text>
         </Card>
       ) : (
         <Card>

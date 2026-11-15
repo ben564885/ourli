@@ -5,61 +5,27 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
 import { Avatar, Body, Button, Card, H2, Loading, Logo, Pill, Screen } from "@/components/ui";
-import { C } from "@/lib/theme";
+import { Onboarding } from "@/components/onboarding";
+import { C, F } from "@/lib/theme";
 import { dayClock, formatCountdown, hourLabel } from "@/lib/time";
 import { useNow } from "@/lib/use-now";
-
-function Onboarding() {
-  const { setUserId } = useSession();
-  const create = useMutation(api.users.create);
-  const [name, setName] = useState("");
-  const [busy, setBusy] = useState(false);
-  return (
-    <Screen scroll={false} style={{ justifyContent: "center", gap: 24 }}>
-      <Logo size={56} />
-      <Text style={{ color: C.muted, fontSize: 20, fontWeight: "600" }}>every hour, together</Text>
-      <Body muted>Start a Day with your friends. Every hour, everyone snaps a photo. Tonight, see how each of your days went, side by side.</Body>
-      <TextInput
-        testID="name-input"
-        placeholder="Your name"
-        placeholderTextColor={C.faint}
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-        autoFocus
-      />
-      <Button
-        testID="onboard-continue"
-        title="Let's go"
-        disabled={!name.trim()}
-        loading={busy}
-        onPress={async () => {
-          setBusy(true);
-          const id = await create({ name });
-          await setUserId(id);
-          setBusy(false);
-        }}
-      />
-    </Screen>
-  );
-}
 
 function ActiveBanner({ day }: { day: any }) {
   const now = useNow();
   const clock = dayClock(day, now);
   const label = day.type === "creator" ? (day.title ?? "Creator Day") : day.groupName;
   return (
-    <Card style={{ backgroundColor: C.accent }} onPress={() => router.push(("/day/" + day._id) as any)}>
+    <Card style={{ backgroundColor: C.sky, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.skyLine }} onPress={() => router.push(("/day/" + day._id) as any)}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Text style={{ color: "#fff", fontWeight: "800", fontSize: 18 }}>{label}</Text>
+        <Text style={{ color: C.text, fontFamily: F.sansBold, fontSize: 19 }}>{label}</Text>
         {day.type === "creator" && <Pill text="Creator Day" color={C.whop} />}
       </View>
-      <Text style={{ color: "#fff", opacity: 0.9 }}>
+      <Text style={{ color: C.muted, fontFamily: F.sans }}>
         {clock.notStarted
           ? "Starts in " + formatCountdown(clock.msLeft)
           : hourLabel(day.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + day.hourCount + " · next in " + formatCountdown(clock.msLeft)}
       </Text>
-      <Text style={{ color: "#fff", fontWeight: "700" }}>Open Day →</Text>
+      <Text style={{ color: C.text, fontFamily: F.serifItalic, fontSize: 17 }}>Open Day →</Text>
     </Card>
   );
 }

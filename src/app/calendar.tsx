@@ -65,7 +65,7 @@ function Month({ year, month, cell, userId, groupId }: { year: number; month: nu
               <Text
                 style={{
                   position: "absolute",
-                  color: inMonth ? C.text : C.faint,
+                  color: hasPhoto || isToday ? "#fff" : inMonth ? C.text : C.faint,
                   opacity: inMonth ? 1 : 0.5,
                   fontSize: 16,
                   fontWeight: "500",
@@ -95,9 +95,9 @@ export default function Calendar() {
   const months = [-2, -1, 0, 1].map((o) => new Date(now.getFullYear(), now.getMonth() + o, 1));
   if (!userId) return null;
   return (
-    <View style={{ flex: 1, backgroundColor: C.accent }}>
+    <View style={{ flex: 1, backgroundColor: C.sky }}>
       <SafeAreaView style={{ flex: 1, paddingHorizontal: 12, paddingTop: 8 }} edges={["top", "left", "right"]}>
-        <View style={{ flex: 1, backgroundColor: C.card, borderTopLeftRadius: 44, borderTopRightRadius: 44, overflow: "hidden" }}>
+        <View style={{ flex: 1, backgroundColor: C.bg, borderTopLeftRadius: 44, borderTopRightRadius: 44, overflow: "hidden" }}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: cardPad, paddingTop: 28, paddingBottom: 8 }}>
             <Pressable accessibilityLabel="Menu" onPress={() => router.back()} style={{ gap: 6, padding: 4 }}>
               <View style={{ width: 26, height: 2, backgroundColor: C.text, borderRadius: 1 }} />

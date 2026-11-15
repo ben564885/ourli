@@ -51,7 +51,7 @@ export default function DayScreen() {
               disabled={future}
               onPress={() => setPicked(i)}
               style={{ paddingHorizontal: 14, height: 36, borderRadius: 18, justifyContent: "center", backgroundColor: active ? C.accent : C.card, opacity: future ? 0.35 : 1 }}>
-              <Text style={{ color: "#fff", fontWeight: "700" }}>{hourLabel(day.startHour + i)}</Text>
+              <Text style={{ color: active ? "#fff" : C.text, fontWeight: "700" }}>{hourLabel(day.startHour + i)}</Text>
             </Pressable>
           );
         })}
