@@ -58,11 +58,6 @@ export default function DayScreen() {
         })}
       </ScrollView>
 
-      <View style={{ flexDirection: "row", alignItems: "baseline", gap: 12, marginTop: 4 }}>
-        <Text style={{ color: C.text, fontFamily: F.sansMedium, fontSize: 56, lineHeight: 60, letterSpacing: -2 }}>{hourLabel(day.startHour + hour)}</Text>
-        <Text style={{ color: C.muted, fontFamily: F.serifItalic, fontSize: 22 }}>{!clock.ended && hour === clock.current && !clock.notStarted ? "happening now" : "hour " + (hour + 1)}</Text>
-      </View>
-
       <HourReveal dayId={dayId} hourIndex={hour} userId={userId} tick={tick} />
 
       {!clock.ended && !clock.notStarted && hour === clock.current && (
