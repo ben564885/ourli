@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { Animated, Easing, Linking, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Easing, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View, ViewStyle } from "react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
+import Lenis from "lenis";
 import { C } from "@/lib/theme";
 
 const SERIF = "Newsreader_400Regular";
@@ -36,7 +37,7 @@ function Pill({ title, onPress, dark = true }: { title: string; onPress: () => v
 }
 
 function PhoneMock() {
-  const names = ["Ben", "Ayush", "Yelena"];
+  const names = ["Ben", "Philip", "Ayush", "Daniel"];
   const hours = ["12 PM", "1 PM", "2 PM", "3 PM"];
   return (
     <View style={s.phone}>
@@ -44,14 +45,14 @@ function PhoneMock() {
         <View style={s.island} />
         <View style={{ paddingTop: 54, paddingHorizontal: 14, paddingBottom: 10, flexDirection: "row", alignItems: "center", gap: 8, borderBottomWidth: 1, borderBottomColor: "#f0f0f0" }}>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontFamily: SANS_M, fontSize: 15, color: "#111" }}>Hackathon crew</Text>
+            <Text style={{ fontFamily: SANS_M, fontSize: 15, color: "#111" }}>ourli crew</Text>
             <Text style={{ fontFamily: SANS, fontSize: 11, color: "#8e8e93" }}>Hour 4 of 6 · 7:42 left</Text>
           </View>
           <View style={{ backgroundColor: "#ee4338", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
             <Text style={{ color: "#fff", fontSize: 11, fontFamily: SANS_M }}>● Live</Text>
           </View>
         </View>
-        <View style={{ flexDirection: "row", paddingLeft: 44, paddingRight: 12, paddingTop: 12, gap: 6 }}>
+        <View style={{ flexDirection: "row", paddingLeft: 44, paddingRight: 12, paddingTop: 12, gap: 4 }}>
           {names.map((n) => (
             <Text key={n} style={{ flex: 1, textAlign: "center", fontFamily: SANS_M, fontSize: 11, color: "#444" }}>{n}</Text>
           ))}
@@ -61,7 +62,7 @@ function PhoneMock() {
             <View key={h} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
               <Text style={{ width: 32, fontFamily: SANS_M, fontSize: 9, color: "#8e8e93" }}>{h}</Text>
               {names.map((n, c) =>
-                r === 3 && c === 2 ? (
+                r === 3 && c === 3 ? (
                   <View key={n} style={{ flex: 1, aspectRatio: 3 / 4, borderRadius: 10, backgroundColor: "#eef0f4", alignItems: "center", justifyContent: "center" }}>
                     <Text style={{ fontSize: 10, color: "#9a9aa0", fontFamily: SANS_M }}>waiting…</Text>
                   </View>
@@ -71,6 +72,9 @@ function PhoneMock() {
               )}
             </View>
           ))}
+        </View>
+        <View style={{ position: "absolute", left: 22, right: 22, bottom: 14, height: 44, borderRadius: 22, backgroundColor: "rgba(245,245,247,0.92)", borderWidth: 1, borderColor: "#e4e4e8", flexDirection: "row", alignItems: "center", justifyContent: "space-around", paddingHorizontal: 6 }}>
+          {["⌂", "◎", null, "♛", "▦"].map((g, k) => g ? <Text key={k} style={{ fontSize: 15, color: k === 0 ? "#111" : "#8e8e93" }}>{g}</Text> : <View key={k} style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: "#111", alignItems: "center", justifyContent: "center" }}><Text style={{ color: "#fff", fontSize: 18, lineHeight: 20 }}>+</Text></View>)}
         </View>
       </View>
     </View>
@@ -137,8 +141,8 @@ function Hero({ wide }: { wide: boolean }) {
 }
 
 const STEPS = [
-  { n: "01", t: "Start a Day", d: "Pick your group and your hours, say 12 PM to 6 PM. Invite friends with a code or a QR.", bg: "#b1c6dd", fg: "#14233a", sub: "#3c5372" },
-  { n: "02", t: "Snap every hour", d: "A ping on the hour. Take your photo anytime in that hour, no filters, no retakes spiral.", bg: "#ffdf6f", fg: "#1d0b0a", sub: "#5a4a1a" },
+  { n: "01", t: "Start a Day", d: "Pick your crew and your hours, say 12 PM to 6 PM. Tap the + in the tab bar and you're live. Friends join with a code or QR.", bg: "#b1c6dd", fg: "#14233a", sub: "#3c5372" },
+  { n: "02", t: "Snap every hour", d: "A ping on the hour, and tapping it opens that Day. Take your photo anytime in the hour. No filters.", bg: "#ffdf6f", fg: "#1d0b0a", sub: "#5a4a1a" },
   { n: "03", t: "Reveal together", d: "Each hour stays hidden until you post yours. Then everyone's photos appear side by side, live.", bg: "#f9bef9", fg: "#2a0f2a", sub: "#6b3a6b" },
   { n: "04", t: "Keep the memory", d: "Tonight's recap is an hour-by-hour grid. Export it, share it, and find it on your calendar.", bg: "#b3f4b7", fg: "#132815", sub: "#2c4a30" },
 ];
@@ -171,8 +175,10 @@ function Dark({ wide }: { wide: boolean }) {
   const items = [
     { n: "01", t: "Hidden until you post", d: "Nobody peeks. An hour only reveals once you've posted yours or the hour closes. Backed by a live Convex query, so it flips in real time." },
     { n: "02", t: "Comments on every photo", d: "Tap any revealed photo to open it full-size and react. Threads are gated by the same reveal rule, so nothing leaks early." },
-    { n: "03", t: "A calendar of days", d: "Every Day becomes a darkened photo tile on your group's calendar. Scroll back through months of your own life together." },
-    { n: "04", t: "One-tap collage", d: "Export the recap as one tall image and send it to Instagram or TikTok. It's the trend, minus the CapCut." },
+    { n: "03", t: "A calendar of days", d: "Every Day becomes a photo tile on a dark calendar that opens on today. Scroll back through months of your own life together." },
+    { n: "04", t: "Join any crew, or several", d: "Create a group or join one with an invite code from the Groups tab. Everyone gets a real profile photo at sign-up, so you know whose hour you're looking at." },
+    { n: "05", t: "A floating glass tab bar", d: "Home, Groups, a center +, Creators and Calendar live in an iOS glass pill that turns dark on Home and the calendar." },
+    { n: "06", t: "One-tap collage", d: "Export the recap as one tall image and send it to Instagram or TikTok. It's the trend, minus the CapCut." },
   ];
   return (
     <View style={{ backgroundColor: "#0D0E11", paddingVertical: 100, paddingHorizontal: 24, alignItems: "center" }}>
@@ -205,7 +211,7 @@ function Creator({ wide }: { wide: boolean }) {
             Spend the day with your <Text style={{ fontFamily: SERIF_I }}>favorite creator.</Text>
           </Text>
           <Text style={{ fontFamily: SANS, fontSize: 17, lineHeight: 25, color: "#6b3a6b", marginTop: 16 }}>
-            Your Whop membership is the ticket in. Sign in with Whop, we check you hold the creator's pass, and every hour you see their photo right next to yours. Tonight you get a recap of your day with them.
+            Browse the Creators tab and watch hour one for free, unblurred. Want the rest of the day? Join through Whop, we check your pass, and every hour you see their photo right next to yours, with a recap tonight.
           </Text>
           <View style={{ marginTop: 26, flexDirection: "row" }}>
             <Pill title="Try a Creator Day" onPress={() => router.push("/welcome")} />
@@ -251,9 +257,33 @@ function Built({ wide }: { wide: boolean }) {
 export function Landing() {
   const { width } = useWindowDimensions();
   const wide = width >= 900;
+  const scroller = useRef<any>(null);
+  const lenis = useRef<Lenis | null>(null);
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const node = scroller.current?.getScrollableNode?.() as HTMLElement | undefined;
+    if (!node) return;
+    const instance = new Lenis({ wrapper: node, content: node.firstElementChild as HTMLElement, lerp: 0.09, smoothWheel: true });
+    lenis.current = instance;
+    let raf = 0;
+    const tick = (t: number) => {
+      instance.raf(t);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      instance.destroy();
+      lenis.current = null;
+    };
+  }, []);
+  const go = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) lenis.current?.scrollTo(el, { offset: -76 });
+  };
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <ScrollView>
+      <ScrollView ref={scroller}>
         <Hero wide={wide} />
         <How wide={wide} />
         <Dark wide={wide} />
@@ -267,8 +297,8 @@ export function Landing() {
         <Text style={{ fontFamily: "InstrumentSans_600SemiBold", fontSize: 24, letterSpacing: -1, color: "#111" }}>ourli</Text>
         {wide && (
           <View style={{ position: "absolute", left: 0, right: 0, flexDirection: "row", justifyContent: "center", gap: 40, pointerEvents: "none" }}>
-            {["How it works", "Creator Days", "Stack"].map((l) => (
-              <Text key={l} style={{ fontFamily: SANS, fontSize: 16, color: "#1a1a1a" }}>{l}</Text>
+            {[["How it works", "how"], ["Creator Days", "creators"], ["Stack", "stack"]].map(([label, id]) => (
+              <Pressable key={id} onPress={() => go(id)} style={{ pointerEvents: "auto" }}><Text style={{ fontFamily: SANS, fontSize: 16, color: "#1a1a1a" }}>{label}</Text></Pressable>
             ))}
           </View>
         )}
