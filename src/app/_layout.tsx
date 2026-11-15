@@ -1,5 +1,7 @@
 import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
+import { useEffect } from "react";
+import * as Notifications from "expo-notifications";
 import { useFonts } from "expo-font";
 import { InstrumentSans_400Regular, InstrumentSans_500Medium, InstrumentSans_600SemiBold } from "@expo-google-fonts/instrument-sans";
 import { Newsreader_400Regular, Newsreader_400Regular_Italic } from "@expo-google-fonts/newsreader";
@@ -13,6 +15,13 @@ const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, { unsa
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({ InstrumentSans_400Regular, InstrumentSans_500Medium, InstrumentSans_600SemiBold, Newsreader_400Regular, Newsreader_400Regular_Italic });
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((res) => {
+      const url = res.notification.request.content.data?.url;
+      if (typeof url === "string") router.push(url.replace("ourli://", "/") as any);
+    });
+    return () => sub.remove();
+  }, []);
   if (!fontsLoaded) return null;
   return (
     <ConvexProvider client={convex}>

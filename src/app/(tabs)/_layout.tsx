@@ -1,6 +1,6 @@
 import { Pressable } from "react-native";
 import { Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import { useSession } from "@/lib/session";
@@ -53,9 +53,14 @@ export default function TabsLayout() {
       }}
       screenListeners={{ tabPress: () => Haptics.selectionAsync() }}>
       <Tabs.Screen name="index" options={{ title: "Home", tabBarIcon: icon("home", "home-outline") }} />
+      <Tabs.Screen name="groups" options={{ title: "Groups", tabBarIcon: icon("people", "people-outline") }} />
       <Tabs.Screen
         name="create"
         options={{ title: "Create", tabBarButton: (p) => <PlusButton onPress={p.onPress as any} /> }}
+      />
+      <Tabs.Screen
+        name="creators"
+        options={{ title: "Creators", tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? "crown" : "crown-outline"} size={28} color={color as string} /> }}
       />
       <Tabs.Screen name="calendar" options={{ title: "Calendar", tabBarIcon: icon("calendar", "calendar-outline") }} />
     </Tabs>

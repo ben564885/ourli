@@ -6,7 +6,6 @@ import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
 import { Avatar, Body, Card, Display, H2, Loading, Logo, Pill, Screen } from "@/components/ui";
-import { GroupsPanel } from "@/components/groups-panel";
 import { Onboarding } from "@/components/onboarding";
 import { Landing } from "@/components/landing";
 import { C, F } from "@/lib/theme";
@@ -94,7 +93,16 @@ function HomeScreen() {
           ))}
         </View>
       )}
-      <GroupsPanel userId={userId} />
+      <View style={{ flexDirection: "row", gap: 12 }}>
+        <Card style={{ flex: 1 }} onPress={() => router.push("/groups")}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: 18, color: C.text }}>Groups</Text>
+          <Text style={{ fontFamily: F.serifItalic, fontSize: 16, color: C.muted }}>Join or create →</Text>
+        </Card>
+        <Card style={{ flex: 1, backgroundColor: C.sky, borderColor: C.skyLine }} onPress={() => router.push("/creators" as any)}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: 18, color: C.text }}>Creator Days</Text>
+          <Text style={{ fontFamily: F.serifItalic, fontSize: 16, color: C.muted }}>Preview hour one →</Text>
+        </Card>
+      </View>
     </Screen>
   );
 }
