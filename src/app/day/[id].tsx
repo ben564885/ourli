@@ -50,12 +50,17 @@ export default function DayScreen() {
               key={i}
               disabled={future}
               onPress={() => setPicked(i)}
-              style={{ paddingHorizontal: 16, height: 40, borderRadius: 999, justifyContent: "center", borderWidth: 1.5, borderStyle: "dashed", borderColor: active ? C.skyLine : C.line, backgroundColor: active ? C.sky : C.bg, opacity: future ? 0.35 : 1 }}>
-              <Text style={{ color: C.text, fontFamily: F.serif, fontSize: 16 }}>{hourLabel(day.startHour + i)}</Text>
+              style={{ paddingHorizontal: 20, height: 48, borderRadius: 999, justifyContent: "center", borderWidth: 1.5, borderColor: active ? C.accent : C.hair, backgroundColor: active ? C.accent : C.card, opacity: future ? 0.35 : 1 }}>
+              <Text style={{ color: active ? C.onAccent : C.text, fontFamily: active ? F.sansBold : F.sansMedium, fontSize: 17 }}>{hourLabel(day.startHour + i)}</Text>
             </Pressable>
           );
         })}
       </ScrollView>
+
+      <View style={{ flexDirection: "row", alignItems: "baseline", gap: 12, marginTop: 4 }}>
+        <Text style={{ color: C.text, fontFamily: F.sansMedium, fontSize: 56, lineHeight: 60, letterSpacing: -2 }}>{hourLabel(day.startHour + hour)}</Text>
+        <Text style={{ color: C.muted, fontFamily: F.serifItalic, fontSize: 22 }}>{!clock.ended && hour === clock.current && !clock.notStarted ? "happening now" : "hour " + (hour + 1)}</Text>
+      </View>
 
       <HourReveal dayId={dayId} hourIndex={hour} userId={userId} tick={tick} />
 
