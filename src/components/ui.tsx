@@ -112,7 +112,7 @@ export function Loading() {
 export function Pill({ text, color = C.accent }: { text: string; color?: string }) {
   return (
     <View style={{ alignSelf: "flex-start", backgroundColor: color, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-      <Text style={{ color: "#fff", fontSize: 12, fontFamily: F.sansBold }}>{text}</Text>
+      <Text style={{ color: color === C.accent || color === C.text || color === C.whop ? C.onAccent : "#fff", fontSize: 12, fontFamily: F.sansBold }}>{text}</Text>
     </View>
   );
 }

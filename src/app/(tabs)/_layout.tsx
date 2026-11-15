@@ -35,7 +35,7 @@ function PlusButton({ onPress }: { onPress?: (e: any) => void }) {
       }}
       style={{ flex: 1, height: 64, alignItems: "center", justifyContent: "center" }}>
       <Animated.View style={[{ width: 48, height: 48, borderRadius: 24, backgroundColor: C.accent, alignItems: "center", justifyContent: "center" }, style]}>
-        <Ionicons name="add" size={30} color="#fff" />
+        <Ionicons name="add" size={30} color={C.onAccent} />
       </Animated.View>
     </Pressable>
   );

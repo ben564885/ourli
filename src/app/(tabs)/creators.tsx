@@ -40,7 +40,7 @@ export default function Creators() {
             <View style={{ flex: 1.6 }}>
               <Image source={d.preview ? { uri: d.preview } : undefined} style={{ width: "100%", aspectRatio: 3 / 4, borderRadius: 20, backgroundColor: C.card }} contentFit="cover" transition={150} />
               <View style={{ position: "absolute", top: 8, left: 8, backgroundColor: "#fff", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: 12, color: C.text }}>{hourLabel(d.startHour)} · free preview</Text>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: 12, color: "#111" }}>{hourLabel(d.startHour)} · free preview</Text>
               </View>
             </View>
             <View style={{ flex: 1, gap: 8 }}>

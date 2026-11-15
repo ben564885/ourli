@@ -17,7 +17,6 @@ import { Loading, Logo } from "@/components/ui";
 const SITE = process.env.EXPO_PUBLIC_CONVEX_SITE_URL!;
 const WEB = process.env.EXPO_PUBLIC_WEB_URL;
 const PASS_URL = "https://whop.com/checkout/plan_CP6L8nLZEpYib";
-const PAPER = C.cardHi;
 
 const MESSAGES: Record<string, string> = {
   no_access: "That Whop account doesn't have the pass yet. Grab it free, then try again.",
@@ -30,7 +29,7 @@ function Fade() {
   return (
     <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 150 }}>
       {Array.from({ length: 10 }, (_, i) => (
-        <View key={i} style={{ flex: 1, backgroundColor: PAPER, opacity: (i + 1) / 10 }} />
+        <View key={i} style={{ flex: 1, backgroundColor: C.cardHi, opacity: (i + 1) / 10 }} />
       ))}
     </View>
   );
@@ -70,7 +69,7 @@ export default function CreatorJoin() {
   if (loading || day === undefined || whop === undefined) return <Loading />;
   if (day === null) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: PAPER, alignItems: "center", justifyContent: "center" }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: C.cardHi, alignItems: "center", justifyContent: "center" }}>
         <Text style={{ fontFamily: F.sansBold, fontSize: 26, color: C.text }}>Creator Day not found</Text>
       </SafeAreaView>
     );
@@ -119,7 +118,7 @@ export default function CreatorJoin() {
   const linkStyle = { fontFamily: F.sansMedium, fontSize: 15, color: C.muted } as const;
 
   return (
-    <View style={{ flex: 1, backgroundColor: PAPER }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+    <View style={{ flex: 1, backgroundColor: C.cardHi }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
       <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
         <ScrollView contentContainerStyle={{ alignItems: "center", paddingBottom: 0 }} showsVerticalScrollIndicator={false}>
           <View style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center", paddingTop: 10, height: 64 }}>
@@ -141,7 +140,7 @@ export default function CreatorJoin() {
                 <View key={i} style={{ width: tile, height: tile * 1.15, borderRadius: 22, overflow: "hidden" }}>
                   {previews?.[i] ? <Image source={{ uri: previews[i] }} style={{ width: "100%", height: "100%" }} contentFit="cover" blurRadius={i === 0 ? 0 : 40} /> : <View style={{ flex: 1, backgroundColor: C.cardHi }} />}
                   <View style={{ position: "absolute", top: 6, right: 6, backgroundColor: "#fff", borderRadius: 999, paddingHorizontal: 6, paddingVertical: 2 }}>
-                    <Text style={{ fontFamily: F.sansMedium, fontSize: 9, color: C.text }}>{hourLabel(day.startHour + i)}</Text>
+                    <Text style={{ fontFamily: F.sansMedium, fontSize: 9, color: "#111" }}>{hourLabel(day.startHour + i)}</Text>
                   </View>
                 </View>
               ))}
@@ -163,7 +162,7 @@ export default function CreatorJoin() {
             </View>
           </View>
 
-          <View style={{ width: "100%", backgroundColor: "#fff", borderTopLeftRadius: 44, borderTopRightRadius: 44, paddingHorizontal: 24, paddingTop: 30, paddingBottom: 34, gap: 16, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 20 }}>
+          <View style={{ width: "100%", backgroundColor: C.bg, borderTopLeftRadius: 44, borderTopRightRadius: 44, paddingHorizontal: 24, paddingTop: 30, paddingBottom: 34, gap: 16, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 20 }}>
             <Text style={{ fontFamily: F.sansMedium, fontSize: 24, textAlign: "center", color: C.text }}>{isCreator ? "Share your Day" : joined ? "You're in" : day.title}</Text>
 
             {status && status !== "ok" && MESSAGES[status] && (
