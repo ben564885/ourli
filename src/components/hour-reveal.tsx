@@ -18,7 +18,7 @@ export function HourReveal({ dayId, hourIndex, userId, tick }: { dayId: Id<"days
         {data.members.map((m) => (
           <View key={m.user._id} style={{ width: "48.5%", gap: 8 }}>
             <Pressable disabled={!m.captureId} onPress={() => router.push(("/photo/" + m.captureId) as any)}>
-              <Photo uri={m.url} blur={!data.revealed} style={{ width: "100%", aspectRatio: 3 / 4 }} />
+              <Photo uri={m.url} blur={!data.revealed} style={{ width: "100%", aspectRatio: 4 / 5 }} />
               {m.commentCount > 0 && (
                 <View style={{ position: "absolute", right: 6, bottom: 6, backgroundColor: "rgba(0,0,0,0.6)", borderRadius: 10, paddingHorizontal: 7, paddingVertical: 2 }}>
                   <Text style={{ color: "#fff", fontSize: 12, fontWeight: "700" }}>💬 {m.commentCount}</Text>

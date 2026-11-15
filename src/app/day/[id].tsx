@@ -19,6 +19,8 @@ export default function DayScreen() {
   const end = useMutation(api.days.end);
   const now = useNow();
   const [picked, setPicked] = useState<number | null>(null);
+  const liveHour = day ? dayClock(day, now).current : 0;
+  const mine = useQuery(api.captures.byHour, userId ? { dayId, hourIndex: liveHour, userId, tick: day ? Math.floor((now - day.startAt) / day.slotMs) : 0 } : "skip");
 
   if (day === undefined || !userId) return <Loading />;
   if (day === null) return <Screen><H1>Day not found</H1></Screen>;
@@ -29,8 +31,7 @@ export default function DayScreen() {
   const title = day.type === "creator" ? (day.title ?? "Creator Day") : day.groupName;
 
   return (
-    <Screen>
-      <Button title="← Home" variant="ghost" style={{ alignSelf: "flex-start", height: 36, paddingHorizontal: 0 }} onPress={() => router.replace("/")} />
+    <Screen style={{ paddingBottom: 24 }}>
       {day.type === "creator" && <Pill text={"Creator Day with " + (day.creator?.name ?? "")} color={C.whop} />}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <H1 style={{ flexShrink: 0 }}>{title}</H1>
@@ -60,16 +61,24 @@ export default function DayScreen() {
 
       <HourReveal dayId={dayId} hourIndex={hour} userId={userId} tick={tick} />
 
-      {!clock.ended && !clock.notStarted && hour === clock.current && (
-        <Button testID="snap" title={"Snap " + hourLabel(day.startHour + clock.current) + " 📸"} onPress={() => router.push({ pathname: "/capture/[dayId]", params: { dayId, hourIndex: String(clock.current) } } as any)} />
-      )}
-      <Button testID="open-recap" title="See the recap" variant="secondary" onPress={() => router.push(("/recap/" + dayId) as any)} />
-      {day.type === "creator" && day.joinCode && day.creatorId === userId && (
-        <Button title="Share fan join link" variant="whop" onPress={() => router.push(("/c/" + day.joinCode) as any)} />
-      )}
-      {!clock.ended && (
-        <Button title="End Day now" variant="ghost" onPress={() => end({ dayId })} />
-      )}
+      {(() => {
+        const canSnap = !clock.ended && !clock.notStarted && hour === clock.current && !mine?.iPosted;
+        return (
+          <>
+            {canSnap && (
+              <Button testID="snap" title={"Snap " + hourLabel(day.startHour + clock.current) + " 📸"} onPress={() => router.push({ pathname: "/capture/[dayId]", params: { dayId, hourIndex: String(clock.current) } } as any)} />
+            )}
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              <Button title="Back" variant="secondary" style={{ flex: 1 }} onPress={() => router.replace("/")} />
+              <Button testID="open-recap" title="See the recap" style={{ flex: 1 }} onPress={() => router.push(("/recap/" + dayId) as any)} />
+            </View>
+            {day.type === "creator" && day.joinCode && day.creatorId === userId && (
+              <Button title="Share fan join link" variant="whop" onPress={() => router.push(("/c/" + day.joinCode) as any)} />
+            )}
+            {canSnap && !clock.ended && <Button title="End Day now" variant="ghost" onPress={() => end({ dayId })} />}
+          </>
+        );
+      })()}
     </Screen>
   );
 }
