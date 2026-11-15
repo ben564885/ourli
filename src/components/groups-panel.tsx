@@ -5,11 +5,13 @@ import { router } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { Body, Button, Card, H2, Pill, GroupBadge } from "./ui";
+import { Body, Button, Card, H2, Pill, GroupBadge, Avatar } from "./ui";
 import { C, F, themed } from "@/lib/theme";
 
 export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"users">; title?: string }) {
   const groups = useQuery(api.groups.mine, { userId });
+  const feed = useQuery(api.creators.feed, { userId });
+  const creatorDays = (feed ?? []).filter((d) => d.joined);
   const createGroup = useMutation(api.groups.create);
   const joinGroup = useMutation(api.groups.join);
   const [groupName, setGroupName] = useState("");
@@ -29,6 +31,18 @@ export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"use
               <Text style={{ color: C.muted, fontFamily: F.serif, fontSize: 16 }}>{g.memberCount} {g.memberCount === 1 ? "member" : "members"} · code {g.inviteCode}</Text>
             </View>
             {g.activeDay && <Pill text="Day live" color={C.accentSoft} />}
+          </View>
+        </Card>
+      ))}
+      {creatorDays.map((d) => (
+        <Card key={d.dayId} onPress={() => router.push(("/day/" + d.dayId) as any)} style={{ backgroundColor: C.sky, borderColor: C.skyLine }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+            <Avatar name={d.creator?.name ?? "?"} color={d.creator?.color ?? C.accent} avatarUrl={d.creator?.avatarUrl} size={48} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={{ color: C.text, fontFamily: F.sansMedium, fontSize: 20 }}>{d.title}</Text>
+              <Text style={{ color: C.muted, fontFamily: F.serif, fontSize: 16 }}>Creator · {d.fanCount} {d.fanCount === 1 ? "fan" : "fans"}</Text>
+            </View>
+            {d.status === "active" && <Pill text="Day live" color={C.accentSoft} />}
           </View>
         </Card>
       ))}

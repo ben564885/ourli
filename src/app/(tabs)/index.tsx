@@ -25,21 +25,13 @@ function DCard({ children, style, onPress }: { children: React.ReactNode; style?
 }
 
 function ActiveBanner({ day }: { day: any }) {
-  const now = useNow();
-  const clock = dayClock(day, now);
-  const label = day.type === "creator" ? (day.title ?? "Creator Day") : day.groupName;
   return (
-    <DCard style={{ backgroundColor: K.sky, borderColor: K.skyLine }} onPress={() => router.push(("/day/" + day._id) as any)}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Text style={{ color: K.text, fontFamily: F.sansMedium, fontSize: 20 }}>{label}</Text>
-        {day.type === "creator" && <Pill text="Creator Day" color={K.text} />}
+    <DCard style={{ backgroundColor: K.sky, borderColor: K.skyLine, paddingVertical: 14, paddingHorizontal: 18, gap: 0 }} onPress={() => router.push(("/day/" + day._id) as any)}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <Text numberOfLines={1} style={{ flex: 1, color: K.text, fontFamily: F.sansMedium, fontSize: 17 }}>{day.title ?? "Creator Day"}</Text>
+        <Text style={{ color: K.muted, fontFamily: F.serifItalic, fontSize: 15 }}>Creator Day</Text>
+        <Ionicons name="arrow-up-outline" size={18} color={K.text} style={{ transform: [{ rotate: "45deg" }] }} />
       </View>
-      <Text style={{ color: K.muted, fontFamily: F.serif, fontSize: 17 }}>
-        {clock.notStarted
-          ? "Starts in " + formatCountdown(clock.msLeft)
-          : hourLabel(day.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + day.hourCount + " · next in " + formatCountdown(clock.msLeft)}
-      </Text>
-      <Text style={{ color: K.text, fontFamily: F.serifItalic, fontSize: 18 }}>Open Day →</Text>
     </DCard>
   );
 }
