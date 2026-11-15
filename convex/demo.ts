@@ -95,3 +95,41 @@ export const fixCrew = internalMutation({
     return "added Daniel";
   },
 });
+
+export const reseedDays = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) return "no group";
+    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    const users = members.map((m) => m.userId);
+    const days = await ctx.db.query("days").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    const pool = new Set<Id<"_storage">>();
+    for (const day of days) {
+      for (const c of await ctx.db.query("captures").withIndex("by_day", (q) => q.eq("dayId", day._id)).collect()) {
+        pool.add(c.storageId);
+        await ctx.db.delete(c._id);
+      }
+      await ctx.db.delete(day._id);
+    }
+    const ids = [...pool];
+    const now = new Date();
+    for (let off = 1; off <= 60; off++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - off);
+      const date = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      const startAt = d.getTime() + 11 * 3600_000;
+      const dayId = await ctx.db.insert("days", { groupId: group._id, date, startHour: 11, endHour: 16, startAt, slotMs: 3600_000, hourCount: 5, status: "done", type: "group" });
+      let cover: Id<"_storage"> | undefined;
+      for (let h = 0; h < 5; h++) {
+        for (const u of users) {
+          if (Math.random() < 0.08) continue;
+          const s = pick(ids);
+          if (!cover) cover = s;
+          await ctx.db.insert("captures", { dayId, userId: u, hourIndex: h, storageId: s, thumbId: s, takenAt: startAt + h * 3600_000 + Math.floor(Math.random() * 50) * 60_000 });
+        }
+      }
+      await ctx.db.patch(dayId, { coverPhotoId: cover ?? pick(ids) });
+    }
+    return "reseeded 60 days for " + users.length + " members";
+  },
+});
