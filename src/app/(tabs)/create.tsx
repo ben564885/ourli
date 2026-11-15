@@ -19,12 +19,13 @@ export default function Create() {
   if (!userId || groups === undefined) return <Loading />;
   const group = groups.find((g) => g._id === (picked ?? groups[0]?._id));
   return (
-    <Screen>
+    <Screen scroll={groups.length === 0} style={{ paddingBottom: 12 }}>
       <View style={{ marginTop: 8 }}>
         <Display lead="Start a" accent="Day" />
         <Text style={{ fontFamily: F.sansMedium, fontSize: 15, color: C.text, marginTop: 10 }}>Pick a group and your hours. Everyone snaps once an hour.</Text>
       </View>
 
+      {groups.length > 0 && <View style={{ flex: 1 }} />}
       {groups.length === 0 ? (
         <GroupsPanel userId={userId} title="Start with a group" />
       ) : (

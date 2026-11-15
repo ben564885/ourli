@@ -1,6 +1,6 @@
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import QRCode from "react-native-qrcode-svg";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
@@ -9,7 +9,6 @@ import { Avatar, Body, Button, Card, H1, H2, Loading, Screen } from "@/component
 import { StartDayForm } from "@/components/start-day-form";
 import { scheduleDayPings } from "@/lib/notifications";
 import { C } from "@/lib/theme";
-import { useState } from "react";
 
 export default function GroupScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,8 +16,6 @@ export default function GroupScreen() {
   const { userId } = useSession();
   const group = useQuery(api.groups.get, { groupId });
   const start = useMutation(api.days.start);
-  const seed = useAction(api.seed.seedGroup);
-  const [seeding, setSeeding] = useState(false);
 
   if (group === undefined || !userId) return <Loading />;
   if (group === null) return <Screen><H1>Group not found</H1></Screen>;
@@ -56,7 +53,8 @@ export default function GroupScreen() {
 
       <Button testID="open-calendar" title="Group calendar" variant="secondary" onPress={() => router.push({ pathname: "/calendar", params: { groupId } } as any)} />
 
-      <Card style={{ alignItems: "center" }}>
+      {!group.demo && (
+        <Card style={{ alignItems: "center" }}>
         <H2>Invite friends</H2>
         <Text selectable style={{ color: C.text, fontSize: 32, fontWeight: "800", letterSpacing: 6 }}>{group.inviteCode}</Text>
         <View style={{ padding: 12, backgroundColor: "#fff", borderRadius: 16 }}>
@@ -64,21 +62,8 @@ export default function GroupScreen() {
         </View>
         <Body muted>Scan or enter the code in ourli</Body>
       </Card>
+      )}
 
-      <Button
-        title="Load demo history"
-        variant="ghost"
-        loading={seeding}
-        onPress={async () => {
-          setSeeding(true);
-          try {
-            const n = await seed({ groupId, userId });
-            Alert.alert("Done", "Added " + n + " past Days to the calendar.");
-          } finally {
-            setSeeding(false);
-          }
-        }}
-      />
     </Screen>
   );
 }
