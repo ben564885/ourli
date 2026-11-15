@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
-import { Avatar, Loading, Pill } from "@/components/ui";
+import { Avatar, GroupBadge, Loading, Pill } from "@/components/ui";
 import { Onboarding } from "@/components/onboarding";
 import { Landing } from "@/components/landing";
 import { Ionicons } from "@expo/vector-icons";
@@ -44,12 +44,67 @@ function ActiveBanner({ day }: { day: any }) {
   );
 }
 
+function GroupStack({ groups }: { groups: any[] }) {
+  const now = useNow();
+  const lead = groups[0].activeDay;
+  const clock = dayClock(lead, now);
+  const peek = 34;
+  const n = Math.min(groups.length, 4);
+  return (
+    <Pressable
+      testID="snap-stack"
+      onPress={() => router.push({ pathname: "/capture/[dayId]", params: { dayId: lead._id, hourIndex: String(clock.current), all: "1" } } as any)}
+      style={({ pressed }) => ({ height: 150 + (n - 1) * peek, transform: [{ scale: pressed ? 0.985 : 1 }] })}>
+      {groups.slice(0, n).map((g, i) => {
+        const front = i === 0;
+        return (
+          <View
+            key={g._id}
+            style={{
+              position: "absolute",
+              left: i * 12,
+              right: i * 12,
+              top: (n - 1 - i) * peek,
+              height: front ? 150 : 150,
+              borderRadius: 30,
+              backgroundColor: front ? K.sky : K.card,
+              borderWidth: 1.5,
+              borderColor: front ? K.skyLine : K.line,
+              padding: 16,
+              zIndex: n - i,
+              shadowColor: "#000",
+              shadowOpacity: 0.25,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 4 },
+            }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+              <GroupBadge color={g.color} icon={g.icon} size={front ? 40 : 24} />
+              <Text style={{ color: K.text, fontFamily: F.sansMedium, fontSize: front ? 20 : 15, flex: 1 }}>{front && groups.length > 1 ? "Snap to your groups" : g.name}</Text>
+              {front && <Pill text="Live" color={K.text} />}
+            </View>
+            {front && (
+              <>
+                <Text style={{ color: K.muted, fontFamily: F.serif, fontSize: 17, marginTop: 14 }}>
+                  {clock.notStarted ? "Starts in " + formatCountdown(clock.msLeft) : hourLabel(lead.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + lead.hourCount + " · next in " + formatCountdown(clock.msLeft)}
+                </Text>
+                <Text style={{ color: K.text, fontFamily: F.serifItalic, fontSize: 19, marginTop: 8 }}>Take a photo, then pick who gets it →</Text>
+              </>
+            )}
+          </View>
+        );
+      })}
+    </Pressable>
+  );
+}
+
 function HomeScreen() {
   const { userId, loading, setUserId } = useSession();
   const [menu, setMenu] = useState(false);
   const { mode, toggle } = useTheme();
   const user = useQuery(api.users.get, userId ? { userId } : "skip");
   const active = useQuery(api.days.activeForUser, userId ? { userId } : "skip");
+  const myGroups = useQuery(api.groups.mine, userId ? { userId } : "skip");
+  const liveGroups = (myGroups ?? []).filter((g) => g.activeDay);
   const recent = useQuery(api.days.byMonth, userId ? { userId, month: monthKey(new Date()) } : "skip") as
     | { date: string; dayId: string; coverPhotoUrl: string | null; type: string }[]
     | undefined;
@@ -88,8 +143,9 @@ function HomeScreen() {
         <Text style={{ fontFamily: F.sansMedium, fontSize: 15, color: K.text, marginTop: 10 }}>No filters. Just your hours, together.</Text>
       </View>
 
-      {active?.map((d) => <ActiveBanner key={d._id} day={d} />)}
-      {active?.length === 0 && (
+      {liveGroups.length > 0 && <GroupStack groups={liveGroups} />}
+      {active?.filter((d) => d.type === "creator").map((d) => <ActiveBanner key={d._id} day={d} />)}
+      {active?.length === 0 && liveGroups.length === 0 && (
         <DCard onPress={() => router.push("/create")}>
           <Text style={{ fontFamily: F.sansMedium, fontSize: 19, color: K.text }}>No Day live right now</Text>
           <Text style={{ fontFamily: F.serifItalic, fontSize: 17, color: K.muted }}>Start one with your friends →</Text>

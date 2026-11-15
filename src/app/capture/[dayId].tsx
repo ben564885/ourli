@@ -19,7 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 const useLiveCamera = Platform.OS !== "web" && Device.isDevice;
 
 export default function Capture() {
-  const { dayId, hourIndex } = useLocalSearchParams<{ dayId: string; hourIndex: string }>();
+  const { dayId, hourIndex, all } = useLocalSearchParams<{ dayId: string; hourIndex: string; all?: string }>();
   const { userId } = useSession();
   const day = useQuery(api.days.get, { dayId: dayId as Id<"days"> });
   const genUrl = useMutation(api.captures.generateUploadUrl);
@@ -45,7 +45,7 @@ export default function Capture() {
 
   const options = day?.type === "creator" ? [] : (groups ?? []).filter((g) => g.activeDay);
   const current = day?.groupId ? String(day.groupId) : null;
-  const picked = chosen ?? (current ? [current] : []);
+  const picked = chosen ?? (all === "1" ? options.map((g) => String(g._id)) : current ? [current] : []);
 
   async function send(targets: { dayId: Id<"days">; hourIndex: number }[]) {
     if (!preview || !userId || targets.length === 0) return;

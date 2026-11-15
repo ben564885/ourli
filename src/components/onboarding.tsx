@@ -85,7 +85,6 @@ export function Onboarding() {
         const now = new Date();
         const res = await joinDemo({ name, avatarId, localHour: now.getHours(), date: localDate(now) });
         await setUserId(res.userId);
-        if (res.dayId) router.push(("/day/" + res.dayId) as any);
         return;
       }
       const id = await create({ name, avatarId });
