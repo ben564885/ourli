@@ -194,6 +194,11 @@ export default function CreatorJoin() {
                   />
                 )}
                 {cta("Unlock the full day", joinWithWhop, !userId && !name.trim(), "join-whop", true)}
+                {status === "no_access" && (
+                  <Pressable testID="claim-pass" onPress={() => Linking.openURL(PASS_URL)} style={{ height: 56, borderRadius: 999, borderWidth: 1.5, borderColor: C.text, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: C.text }}>1. Claim the free pass, then tap Unlock again</Text>
+                  </Pressable>
+                )}
                 <View style={{ gap: 8, alignSelf: "center" }}>
                   {["Every hour, side by side with " + creatorName, "A recap of your day together", "Free pass · $0, checked through Whop"].map((t) => (
                     <View key={t} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
