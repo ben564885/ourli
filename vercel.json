@@ -1,4 +1,7 @@
 {
+  "installCommand": "npm ci --no-audit --no-fund",
+  "buildCommand": "npx expo export -p web",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/(.*)",
