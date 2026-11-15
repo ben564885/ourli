@@ -130,7 +130,7 @@ function Hero({ wide }: { wide: boolean }) {
             </Bob>
             <Bob style={{ position: "absolute", right: 120, top: 330 }} delay={1300}>
               <View style={[s.float, { backgroundColor: "#b3f4b7", paddingVertical: 14, paddingHorizontal: 22, borderRadius: 999 }]}>
-                <Text style={{ fontFamily: SANS_M, fontSize: 15, color: "#132815" }}>💬 "that sunset!!" · Maya</Text>
+                <Text style={{ fontFamily: SANS_M, fontSize: 15, color: "#132815" }}>"that sunset!!" · Maya</Text>
               </View>
             </Bob>
           </>

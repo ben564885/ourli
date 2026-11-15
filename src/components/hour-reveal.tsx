@@ -1,5 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
@@ -20,8 +21,9 @@ export function HourReveal({ dayId, hourIndex, userId, tick }: { dayId: Id<"days
             <Pressable disabled={!m.captureId} onPress={() => router.push(("/photo/" + m.captureId) as any)}>
               <Photo uri={m.url} blur={!data.revealed} style={{ width: "100%", aspectRatio: 4 / 5 }} />
               {m.commentCount > 0 && (
-                <View style={{ position: "absolute", right: 6, bottom: 6, backgroundColor: "rgba(0,0,0,0.6)", borderRadius: 10, paddingHorizontal: 7, paddingVertical: 2 }}>
-                  <Text style={{ color: "#fff", fontSize: 12, fontWeight: "700" }}>💬 {m.commentCount}</Text>
+                <View style={{ position: "absolute", right: 8, bottom: 8, flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "rgba(0,0,0,0.6)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 4 }}>
+                  <Ionicons name="chatbubble" size={13} color="#fff" />
+                  <Text style={{ color: "#fff", fontSize: 12, fontWeight: "700" }}>{m.commentCount}</Text>
                 </View>
               )}
               {!m.url && (
