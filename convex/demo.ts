@@ -61,3 +61,18 @@ export const backfillUser = internalMutation({
     }
   },
 });
+
+export const removeTesters = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    let n = 0;
+    for (const u of await ctx.db.query("users").collect()) {
+      if (!u.name.startsWith("Tester")) continue;
+      for (const m of await ctx.db.query("groupMembers").withIndex("by_user", (q) => q.eq("userId", u._id)).collect()) await ctx.db.delete(m._id);
+      for (const c of await ctx.db.query("captures").filter((q) => q.eq(q.field("userId"), u._id)).collect()) await ctx.db.delete(c._id);
+      await ctx.db.delete(u._id);
+      n++;
+    }
+    return n;
+  },
+});
