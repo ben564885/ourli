@@ -57,9 +57,11 @@ function Month({ year, month, cell, userId, groupId, onToday }: { year: number; 
               onPress={() => entry && router.push(("/recap/" + entry.dayId) as any)}
               style={{ width: cell, height: cell + 12, alignItems: "center", justifyContent: "center" }}>
               {hasPhoto ? (
-                <View style={{ width: tile, height: tile, borderRadius: 11, overflow: "hidden", borderWidth: isToday ? 2.5 : 0, borderColor: C.text }}>
-                  <Image source={{ uri: entry!.coverPhotoUrl! }} style={{ width: "100%", height: "100%" }} contentFit="cover" transition={150} />
-                  <View style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.5)" }} />
+                <View style={[{ width: tile, height: tile, borderRadius: 11 }, isToday && { shadowColor: "#000", shadowOpacity: 0.85, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 12 }]}>
+                  <View style={{ flex: 1, borderRadius: 11, overflow: "hidden" }}>
+                    <Image source={{ uri: entry!.coverPhotoUrl! }} style={{ width: "100%", height: "100%" }} contentFit="cover" transition={150} />
+                    <View style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.5)" }} />
+                  </View>
                 </View>
               ) : isToday ? (
                 <View style={{ width: tile, height: tile, borderRadius: tile / 2, backgroundColor: C.text }} />

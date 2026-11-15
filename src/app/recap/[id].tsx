@@ -8,7 +8,7 @@ import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useSession } from "@/lib/session";
 import { C } from "@/lib/theme";
-import { hourLabel, timeOf } from "@/lib/time";
+import { hourLabel } from "@/lib/time";
 import { Avatar, Button, H1, Loading, Logo, Photo, Screen } from "@/components/ui";
 
 export default function Recap() {
@@ -55,9 +55,6 @@ export default function Recap() {
                 {cell.url ? (
                   <View>
                     <Photo uri={cell.thumbUrl ?? cell.url} style={{ width: "100%", aspectRatio: 3 / 4 }} />
-                    <Text style={{ position: "absolute", bottom: 4, left: 6, color: "#fff", fontSize: 10, fontWeight: "700", textShadowColor: "#000", textShadowRadius: 3 }}>
-                      {cell.takenAt ? timeOf(cell.takenAt) : ""}
-                    </Text>
                   </View>
                 ) : (
                   <View style={{ width: "100%", aspectRatio: 3 / 4, borderRadius: 12, backgroundColor: C.card, alignItems: "center", justifyContent: "center" }}>

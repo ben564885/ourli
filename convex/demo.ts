@@ -227,3 +227,37 @@ export const joinDemo = mutation({
     return { userId, groupId: group._id };
   },
 });
+
+export const seedRange = internalMutation({
+  args: { storageIds: v.array(v.id("_storage")), from: v.number(), to: v.number() },
+  handler: async (ctx, { storageIds, from, to }) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) return "no group";
+    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    const users = members.map((m) => m.userId);
+    const now = new Date();
+    let n = 0;
+    for (let off = from; off <= to; off++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off);
+      const date = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      for (const day of await ctx.db.query("days").withIndex("by_group_date", (q) => q.eq("groupId", group._id).eq("date", date)).collect()) {
+        for (const c of await ctx.db.query("captures").withIndex("by_day", (q) => q.eq("dayId", day._id)).collect()) await ctx.db.delete(c._id);
+        await ctx.db.delete(day._id);
+      }
+      const startAt = d.getTime() + 11 * 3600_000;
+      const dayId = await ctx.db.insert("days", { groupId: group._id, date, startHour: 11, endHour: 16, startAt, slotMs: 3600_000, hourCount: 5, status: "done", type: "group" });
+      let cover: Id<"_storage"> | undefined;
+      for (let h = 0; h < 5; h++) {
+        for (const u of users) {
+          if (Math.random() < 0.06) continue;
+          const s = pick(storageIds);
+          if (!cover) cover = s;
+          await ctx.db.insert("captures", { dayId, userId: u, hourIndex: h, storageId: s, thumbId: s, takenAt: startAt + h * 3600_000 + Math.floor(Math.random() * 50) * 60_000 });
+        }
+      }
+      await ctx.db.patch(dayId, { coverPhotoId: cover ?? pick(storageIds) });
+      n++;
+    }
+    return "seeded " + n + " days";
+  },
+});
