@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Animated2, { FadeIn, FadeOut } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
 import { uploadAvatar } from "@/lib/upload";
 import { localDate } from "@/lib/time";
 import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -68,10 +69,17 @@ export function Onboarding() {
     if (!res.canceled) setPhoto(res.assets[0].uri);
   }
 
-  async function finish() {
+  async function take() {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) return pick();
+    const res = await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.8, cameraType: ImagePicker.CameraType.front });
+    if (!res.canceled) setPhoto(res.assets[0].uri);
+  }
+
+  async function finish(skip = false) {
     setBusy(true);
     try {
-      const avatarId = photo ? await uploadAvatar(photo, () => genUrl()) : undefined;
+      const avatarId = photo && !skip ? await uploadAvatar(photo, () => genUrl()) : undefined;
       const typed = code.trim().toUpperCase();
       if (!typed || typed === "OURLI1") {
         const now = new Date();
@@ -98,12 +106,27 @@ export function Onboarding() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <View style={{ alignItems: "center", paddingTop: step === "intro" ? 72 : 40, paddingHorizontal: 24 }}>
-          <Text style={s.h1}>Let's share</Text>
-          <Text style={s.h1Serif}>your day</Text>
-          <Text style={s.h1}>hour by hour</Text>
-          <Text style={s.sub}>{step === "intro" ? "No filters. Just your hours, together." : step === "photo" ? "Add a photo so your friends know it's you." : step === "code" ? "Your name, then the code your friend sent." : "What should your friends call you?"}</Text>
-        </View>
+        {step === "photo" ? (
+          <View style={{ paddingHorizontal: 24, paddingTop: 12 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", height: 44 }}>
+              <Pressable testID="photo-back" accessibilityLabel="Back" onPress={() => setStep(from)} hitSlop={12}>
+                <Ionicons name="chevron-back" size={28} color={C.text} />
+              </Pressable>
+              <Pressable testID="photo-skip" onPress={() => { setPhoto(null); finish(true); }} hitSlop={12}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: C.text }}>Skip</Text>
+              </Pressable>
+            </View>
+            <Text style={{ fontFamily: F.sansMedium, fontSize: 40, lineHeight: 44, letterSpacing: -1.4, color: C.text, marginTop: 18 }}>Upload your <Text style={{ fontFamily: F.serifItalic, fontSize: 42 }}>photo</Text></Text>
+            <Text style={{ fontFamily: F.sans, fontSize: 16, lineHeight: 22, color: C.muted, marginTop: 8 }}>Choose a profile picture so your friends know it's you.</Text>
+          </View>
+        ) : (
+          <View style={{ alignItems: "center", paddingTop: step === "intro" ? 72 : 40, paddingHorizontal: 24 }}>
+            <Text style={s.h1}>Let's share</Text>
+            <Text style={s.h1Serif}>your day</Text>
+            <Text style={s.h1}>hour by hour</Text>
+            <Text style={s.sub}>{step === "intro" ? "No filters. Just your hours, together." : step === "code" ? "Your name, then the code your friend sent." : "What should your friends call you?"}</Text>
+          </View>
+        )}
 
         <Animated2.View key={step} entering={FadeIn.duration(300)} exiting={FadeOut.duration(120)}>
         {step === "intro" ? (
@@ -113,11 +136,10 @@ export function Onboarding() {
             <Marquee chips={ROWS[2]} duration={28000} />
           </View>
         ) : step === "photo" ? (
-          <View style={{ alignItems: "center", marginTop: 36, gap: 18 }}>
-            <Pressable testID="pick-avatar" onPress={pick} style={{ width: 168, height: 168, borderRadius: 84, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, backgroundColor: photo ? C.bg : C.sky, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
-              {photo ? <Image source={{ uri: photo }} style={{ width: "100%", height: "100%" }} contentFit="cover" /> : <Text style={{ fontFamily: F.serifItalic, fontSize: 20, color: C.text }}>Add photo</Text>}
+          <View style={{ alignItems: "center", marginTop: 56 }}>
+            <Pressable testID="pick-avatar" onPress={pick} style={{ width: 230, height: 230, borderRadius: 115, borderWidth: 2, borderStyle: "dashed", borderColor: C.line, backgroundColor: C.card, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+              {photo ? <Image source={{ uri: photo }} style={{ width: "100%", height: "100%" }} contentFit="cover" /> : <Ionicons name="person-outline" size={110} color={C.text} />}
             </Pressable>
-            <Pressable onPress={pick}><Text style={s.link}>{photo ? "Choose a different photo" : "Choose from library"}</Text></Pressable>
           </View>
         ) : (
           <View style={{ gap: 12, marginTop: 36, paddingHorizontal: 24 }}>
@@ -142,10 +164,17 @@ export function Onboarding() {
             <>
               {step === "photo" ? (
                 <>
-                  <Button testID="onboard-finish" title={photo ? "Let's go" : "Skip for now"} loading={busy} onPress={finish} />
-                  <Pressable onPress={() => setStep(from)} style={{ height: 52, alignItems: "center", justifyContent: "center" }}>
-                    <Text style={s.link}>Back</Text>
-                  </Pressable>
+                  {photo ? (
+                    <>
+                      <Button testID="onboard-finish" title="Let's go" loading={busy} onPress={() => finish()} />
+                      <Pressable onPress={pick} style={{ height: 56, borderRadius: 999, borderWidth: 1.5, borderColor: C.text, alignItems: "center", justifyContent: "center" }}><Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: C.text }}>Choose a different photo</Text></Pressable>
+                    </>
+                  ) : (
+                    <>
+                      <Button testID="take-photo" title="Take photo" onPress={take} />
+                      <Pressable testID="select-photo" onPress={pick} style={{ height: 56, borderRadius: 999, borderWidth: 1.5, borderColor: C.text, alignItems: "center", justifyContent: "center" }}><Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: C.text }}>Select photo</Text></Pressable>
+                    </>
+                  )}
                 </>
               ) : (
                 <>
