@@ -30,7 +30,7 @@ export default function GroupScreen() {
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         {group.members.map((m) => (
           <View key={m._id} style={{ alignItems: "center", gap: 4, width: 64 }}>
-            <Avatar name={m.name} color={m.color} size={44} />
+            <Avatar name={m.name} color={m.color} size={44} avatarUrl={m.avatarUrl} />
             <Text numberOfLines={1} style={{ color: C.muted, fontSize: 12 }}>{m.name}</Text>
           </View>
         ))}

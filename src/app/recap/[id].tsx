@@ -38,7 +38,7 @@ export default function Recap() {
         <View style={{ flexDirection: "row", gap: 6, paddingLeft: 52 }}>
           {users.map((u) => (
             <View key={u._id} style={{ flex: 1, alignItems: "center", gap: 4 }}>
-              <Avatar name={u.name} color={u.color} size={28} />
+              <Avatar name={u.name} color={u.color} size={28} avatarUrl={u.avatarUrl} />
               <Text numberOfLines={1} style={{ color: C.text, fontSize: 12, fontWeight: "600" }}>{u._id === userId ? "You" : u.name}</Text>
             </View>
           ))}

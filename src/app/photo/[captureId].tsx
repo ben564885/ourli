@@ -29,7 +29,7 @@ export default function PhotoScreen() {
           {data && (
             <>
               <View style={{ flex: 1 }} />
-              <Avatar name={data.author?.name ?? "?"} color={data.author?.color ?? C.accent} size={28} />
+              <Avatar name={data.author?.name ?? "?"} color={data.author?.color ?? C.accent} size={28} avatarUrl={data.author?.avatarUrl} />
               <Text style={{ color: C.text, fontWeight: "700" }}>{data.author?.name}</Text>
               <Text style={{ color: C.muted }}>{hourLabel(data.hour)} · {timeOf(data.takenAt)}</Text>
             </>
@@ -44,7 +44,7 @@ export default function PhotoScreen() {
               {data.comments.length === 0 && <Text style={{ color: C.muted }}>No comments yet. Say something nice.</Text>}
               {data.comments.map((c) => (
                 <View key={c._id} style={{ flexDirection: "row", gap: 10, alignItems: "flex-start" }}>
-                  <Avatar name={c.user?.name ?? "?"} color={c.user?.color ?? C.accent} size={28} />
+                  <Avatar name={c.user?.name ?? "?"} color={c.user?.color ?? C.accent} size={28} avatarUrl={c.user?.avatarUrl} />
                   <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 14, padding: 10 }}>
                     <Text style={{ color: C.muted, fontSize: 12, fontWeight: "700" }}>{c.user?.name} · {timeOf(c._creationTime)}</Text>
                     <Text style={{ color: C.text, fontSize: 15, marginTop: 2 }}>{c.text}</Text>

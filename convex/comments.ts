@@ -1,7 +1,7 @@
 import { mutation, query, QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
-import { canAccessDay } from "./lib";
+import { addAvatar, canAccessDay } from "./lib";
 
 async function visibleCapture(ctx: QueryCtx, captureId: Id<"captures">, userId: Id<"users">) {
   const capture = await ctx.db.get(captureId);
@@ -24,9 +24,9 @@ export const forCapture = query({
     const found = await visibleCapture(ctx, captureId, userId);
     if (!found) return null;
     const { capture, day } = found;
-    const author = await ctx.db.get(capture.userId);
+    const author = await addAvatar(ctx, await ctx.db.get(capture.userId));
     const rows = await ctx.db.query("comments").withIndex("by_capture", (q) => q.eq("captureId", captureId)).collect();
-    const comments = await Promise.all(rows.map(async (c) => ({ ...c, user: await ctx.db.get(c.userId) })));
+    const comments = await Promise.all(rows.map(async (c) => ({ ...c, user: await addAvatar(ctx, await ctx.db.get(c.userId)) })));
     return {
       url: await ctx.storage.getUrl(capture.storageId),
       takenAt: capture.takenAt,

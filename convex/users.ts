@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { addAvatar } from "./lib";
 
 const COLORS = ["#7C83FD", "#FF8FAB", "#FFB86B", "#5EE6A8", "#6BC5FF", "#C38BFF", "#FFD166"];
 
@@ -13,7 +14,7 @@ export const create = mutation({
 
 export const get = query({
   args: { userId: v.id("users") },
-  handler: async (ctx, { userId }) => ctx.db.get(userId),
+  handler: async (ctx, { userId }) => addAvatar(ctx, await ctx.db.get(userId)),
 });
 
 export const rename = mutation({

@@ -54,7 +54,7 @@ function HomeScreen() {
         <Logo />
         <View style={{ zIndex: 20 }}>
           <Pressable testID="avatar" accessibilityLabel="Profile menu" onPress={() => setMenu((m) => !m)}>
-            <Avatar name={user.name} color={user.color} />
+            <Avatar name={user.name} color={user.color} avatarUrl={user.avatarUrl} />
           </Pressable>
           {menu && (
             <View style={{ position: "absolute", top: 46, right: 0, width: 200, backgroundColor: C.bg, borderRadius: 20, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, paddingVertical: 6, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}>

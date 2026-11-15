@@ -1,4 +1,4 @@
-import { internalMutation } from "./_generated/server";
+import { internalMutation, mutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
@@ -145,12 +145,37 @@ export const dedupeCrew = internalMutation({
     for (const m of members) {
       const u = await ctx.db.get(m.userId);
       if (!u) continue;
-      if (seen.has(u.name)) {
+      if (seen.has(u.name) || !PEOPLE.some((p) => p.name === u.name)) {
         for (const c of await ctx.db.query("captures").filter((q) => q.eq(q.field("userId"), u._id)).collect()) await ctx.db.delete(c._id);
         await ctx.db.delete(m._id);
         n++;
       } else seen.add(u.name);
     }
     return "removed " + n;
+  },
+});
+
+export const loginBen = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) throw new Error("Demo group is not seeded");
+    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    for (const m of members) {
+      const u = await ctx.db.get(m.userId);
+      if (u?.name === "Ben") return { userId: u._id, groupId: group._id };
+    }
+    throw new Error("Demo Ben is missing");
+  },
+});
+
+export const setAvatars = internalMutation({
+  args: { storageId: v.id("_storage") },
+  handler: async (ctx, { storageId }) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) return 0;
+    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    for (const m of members) await ctx.db.patch(m.userId, { avatarId: storageId });
+    return members.length;
   },
 });

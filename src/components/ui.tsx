@@ -78,7 +78,8 @@ export function Card({ children, style, onPress }: { children: ReactNode; style?
   return <View style={[s.card, style]}>{children}</View>;
 }
 
-export function Avatar({ name, color, size = 36 }: { name: string; color: string; size?: number }) {
+export function Avatar({ name, color, size = 36, avatarUrl }: { name: string; color: string; size?: number; avatarUrl?: string | null }) {
+  if (avatarUrl) return <Image source={{ uri: avatarUrl }} style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }} contentFit="cover" />;
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ color: "#111", fontFamily: F.sansBold, fontSize: size * 0.42 }}>{name.slice(0, 1).toUpperCase()}</Text>

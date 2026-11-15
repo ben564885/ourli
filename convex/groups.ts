@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { randomCode } from "./lib";
+import { addAvatar, randomCode } from "./lib";
 
 export const create = mutation({
   args: { name: v.string(), userId: v.id("users") },
@@ -63,7 +63,7 @@ export const get = query({
     const group = await ctx.db.get(groupId);
     if (!group) return null;
     const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", groupId)).collect();
-    const users = await Promise.all(members.map((m) => ctx.db.get(m.userId)));
+    const users = await Promise.all(members.map(async (m) => addAvatar(ctx, await ctx.db.get(m.userId))));
     const activeDay = await ctx.db
       .query("days")
       .withIndex("by_group", (q) => q.eq("groupId", groupId))

@@ -143,7 +143,7 @@ export const activeForUser = query({
   },
 });
 
-function visibleUsers(day: Doc<"days">, all: Doc<"users">[], viewer: Id<"users">) {
+function visibleUsers<U extends { _id: Id<"users"> }>(day: Doc<"days">, all: U[], viewer: Id<"users">): U[] {
   if (day.type === "group" || day.creatorId === viewer) return all;
   return all.filter((u) => u._id === day.creatorId || u._id === viewer);
 }

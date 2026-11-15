@@ -50,6 +50,7 @@ export function Onboarding() {
   const { setUserId } = useSession();
   const create = useMutation(api.users.create);
   const join = useMutation(api.groups.join);
+  const loginBen = useMutation(api.demo.loginBen);
   const [step, setStep] = useState<"intro" | "name" | "code">("intro");
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
@@ -58,6 +59,13 @@ export function Onboarding() {
   async function finish() {
     setBusy(true);
     try {
+      const demo = name.trim().toLowerCase() === "ben" || code.trim().toUpperCase() === "OURLI1";
+      if (demo) {
+        const res = await loginBen();
+        await setUserId(res.userId);
+        if (step === "code") router.push(("/group/" + res.groupId) as any);
+        return;
+      }
       const id = await create({ name });
       if (step === "code" && code.trim()) {
         try {

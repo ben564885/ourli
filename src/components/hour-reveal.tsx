@@ -33,7 +33,7 @@ export function HourReveal({ dayId, hourIndex, userId, tick }: { dayId: Id<"days
               )}
             </Pressable>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Avatar name={m.user.name} color={m.user.color} size={20} />
+              <Avatar name={m.user.name} color={m.user.color} size={20} avatarUrl={m.user.avatarUrl} />
               <Text numberOfLines={1} style={{ color: C.text, fontSize: 13, flex: 1 }}>{m.user._id === userId ? "You" : m.user.name}</Text>
               {m.takenAt && <Text style={{ color: C.muted, fontSize: 11 }}>{timeOf(m.takenAt)}</Text>}
             </View>
