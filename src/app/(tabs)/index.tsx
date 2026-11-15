@@ -50,7 +50,7 @@ function HomeScreen() {
     <Screen>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Logo />
-        <Pressable onLongPress={() => setUserId(null)}>
+        <Pressable testID="avatar" accessibilityLabel="Back to welcome" onPress={() => setUserId(null)}>
           <Avatar name={user.name} color={user.color} />
         </Pressable>
       </View>

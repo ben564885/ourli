@@ -10,6 +10,7 @@ export default defineSchema({
   groups: defineTable({
     name: v.string(),
     inviteCode: v.string(),
+    demo: v.optional(v.boolean()),
     createdBy: v.id("users"),
   }).index("by_invite", ["inviteCode"]),
   groupMembers: defineTable({

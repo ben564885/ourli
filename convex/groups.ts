@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { randomCode } from "./lib";
 
 export const create = mutation({
@@ -27,7 +28,10 @@ export const join = mutation({
       .query("groupMembers")
       .withIndex("by_group_user", (q) => q.eq("groupId", group._id).eq("userId", userId))
       .unique();
-    if (!existing) await ctx.db.insert("groupMembers", { groupId: group._id, userId });
+    if (!existing) {
+      await ctx.db.insert("groupMembers", { groupId: group._id, userId });
+      if (group.demo) await ctx.scheduler.runAfter(0, internal.demo.backfillUser, { groupId: group._id, userId });
+    }
     return group._id;
   },
 });

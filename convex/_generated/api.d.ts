@@ -12,6 +12,7 @@ import type * as captures from "../captures.js";
 import type * as comments from "../comments.js";
 import type * as creator from "../creator.js";
 import type * as days from "../days.js";
+import type * as demo from "../demo.js";
 import type * as groups from "../groups.js";
 import type * as http from "../http.js";
 import type * as lib from "../lib.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   creator: typeof creator;
   days: typeof days;
+  demo: typeof demo;
   groups: typeof groups;
   http: typeof http;
   lib: typeof lib;
