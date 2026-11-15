@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useSession } from "@/lib/session";
@@ -16,7 +16,6 @@ export default function DayScreen() {
   const dayId = id as Id<"days">;
   const { userId } = useSession();
   const day = useQuery(api.days.get, { dayId });
-  const end = useMutation(api.days.end);
   const now = useNow();
   const [picked, setPicked] = useState<number | null>(null);
   const liveHour = day ? dayClock(day, now).current : 0;
@@ -31,7 +30,7 @@ export default function DayScreen() {
   const title = day.type === "creator" ? (day.title ?? "Creator Day") : day.groupName;
 
   return (
-    <Screen style={{ paddingBottom: 24 }}>
+    <Screen scroll={false} style={{ paddingBottom: 24 }}>
       {day.type === "creator" && <Pill text={"Creator Day with " + (day.creator?.name ?? "")} color={C.whop} />}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <H1 style={{ flexShrink: 0 }}>{title}</H1>
@@ -68,6 +67,13 @@ export default function DayScreen() {
             {canSnap && (
               <Button testID="snap" title={"Snap " + hourLabel(day.startHour + clock.current) + " 📸"} onPress={() => router.push({ pathname: "/capture/[dayId]", params: { dayId, hourIndex: String(clock.current) } } as any)} />
             )}
+            {day.type === "creator" && day.joinCode && day.creatorId === userId && (
+              <Button title="Share fan join link" variant="whop" onPress={() => router.push(("/c/" + day.joinCode) as any)} />
+            )}
+          </>
+        );
+      })()}
+      <View style={{ flex: 1 }} />
             <View style={{ flexDirection: "row", gap: 12 }}>
               <Pressable testID="day-done" onPress={() => router.replace("/")} style={{ flex: 1, height: 56, borderRadius: 999, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF", borderWidth: 1.5, borderColor: C.hair }}>
                 <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: "#111111" }}>Done</Text>
@@ -76,13 +82,6 @@ export default function DayScreen() {
                 <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: "#FFFFFF" }}>See the recap</Text>
               </Pressable>
             </View>
-            {day.type === "creator" && day.joinCode && day.creatorId === userId && (
-              <Button title="Share fan join link" variant="whop" onPress={() => router.push(("/c/" + day.joinCode) as any)} />
-            )}
-            {canSnap && !clock.ended && <Button title="End Day now" variant="ghost" onPress={() => end({ dayId })} />}
-          </>
-        );
-      })()}
     </Screen>
   );
 }
