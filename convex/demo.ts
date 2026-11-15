@@ -1,12 +1,14 @@
 import { internalMutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 
 const CODE = "OURLI1";
 const PEOPLE = [
-  { name: "Ayush", color: "#7C83FD" },
-  { name: "Yelena", color: "#FF8FAB" },
+  { name: "Ben", color: "#FF8FAB" },
   { name: "Philip", color: "#5EE6A8" },
+  { name: "Ayush", color: "#7C83FD" },
+  { name: "Daniel", color: "#FFB86B" },
 ];
 
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
@@ -74,5 +76,22 @@ export const removeTesters = internalMutation({
       n++;
     }
     return n;
+  },
+});
+
+export const fixCrew = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) return "no group";
+    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    const users = (await Promise.all(members.map((m) => ctx.db.get(m.userId)))).filter((u) => u !== null);
+    const yelena = users.find((u) => u.name === "Yelena");
+    if (yelena) await ctx.db.patch(yelena._id, { name: "Ben", color: "#FF8FAB" });
+    if (users.some((u) => u.name === "Daniel")) return "renamed";
+    const daniel = await ctx.db.insert("users", { name: "Daniel", color: "#FFB86B" });
+    await ctx.db.insert("groupMembers", { groupId: group._id, userId: daniel });
+    await ctx.scheduler.runAfter(0, internal.demo.backfillUser, { groupId: group._id, userId: daniel });
+    return "added Daniel";
   },
 });
