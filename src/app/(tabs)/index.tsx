@@ -1,5 +1,6 @@
 import { Platform, Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
@@ -49,9 +50,14 @@ function HomeScreen() {
     <Screen>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Logo />
-        <Pressable onLongPress={() => setUserId(null)} onPress={() => router.push("/calendar")}>
-          <Avatar name={user.name} color={user.color} />
-        </Pressable>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <Pressable testID="open-groups" accessibilityLabel="Groups" onPress={() => router.push("/groups")} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, alignItems: "center", justifyContent: "center" }}>
+            <Ionicons name="people-outline" size={22} color={C.text} />
+          </Pressable>
+          <Pressable onLongPress={() => setUserId(null)}>
+            <Avatar name={user.name} color={user.color} />
+          </Pressable>
+        </View>
       </View>
 
       <View style={{ marginTop: 18, marginBottom: 6 }}>
