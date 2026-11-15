@@ -69,8 +69,12 @@ export default function DayScreen() {
               <Button testID="snap" title={"Snap " + hourLabel(day.startHour + clock.current) + " 📸"} onPress={() => router.push({ pathname: "/capture/[dayId]", params: { dayId, hourIndex: String(clock.current) } } as any)} />
             )}
             <View style={{ flexDirection: "row", gap: 12 }}>
-              <Button title="Back" variant="secondary" style={{ flex: 1 }} onPress={() => router.replace("/")} />
-              <Button testID="open-recap" title="See the recap" style={{ flex: 1 }} onPress={() => router.push(("/recap/" + dayId) as any)} />
+              <Pressable testID="day-done" onPress={() => router.replace("/")} style={{ flex: 1, height: 56, borderRadius: 999, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF", borderWidth: 1.5, borderColor: C.hair }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: "#111111" }}>Done</Text>
+              </Pressable>
+              <Pressable testID="open-recap" onPress={() => router.push(("/recap/" + dayId) as any)} style={{ flex: 1, height: 56, borderRadius: 999, alignItems: "center", justifyContent: "center", backgroundColor: "#2F6FDB" }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: "#FFFFFF" }}>See the recap</Text>
+              </Pressable>
             </View>
             {day.type === "creator" && day.joinCode && day.creatorId === userId && (
               <Button title="Share fan join link" variant="whop" onPress={() => router.push(("/c/" + day.joinCode) as any)} />
