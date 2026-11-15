@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -34,6 +35,7 @@ function ActiveBanner({ day }: { day: any }) {
 
 function HomeScreen() {
   const { userId, loading, setUserId } = useSession();
+  const [menu, setMenu] = useState(false);
   const user = useQuery(api.users.get, userId ? { userId } : "skip");
   const active = useQuery(api.days.activeForUser, userId ? { userId } : "skip");
   const recent = useQuery(api.days.byMonth, userId ? { userId, month: monthKey(new Date()) } : "skip") as
@@ -50,9 +52,19 @@ function HomeScreen() {
     <Screen>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Logo />
-        <Pressable testID="avatar" accessibilityLabel="Back to welcome" onPress={() => setUserId(null)}>
-          <Avatar name={user.name} color={user.color} />
-        </Pressable>
+        <View style={{ zIndex: 20 }}>
+          <Pressable testID="avatar" accessibilityLabel="Profile menu" onPress={() => setMenu((m) => !m)}>
+            <Avatar name={user.name} color={user.color} />
+          </Pressable>
+          {menu && (
+            <View style={{ position: "absolute", top: 46, right: 0, width: 200, backgroundColor: C.bg, borderRadius: 20, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, paddingVertical: 6, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}>
+              <Text style={{ fontFamily: F.sans, fontSize: 13, color: C.muted, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>{user.name}</Text>
+              <Pressable testID="back-to-welcome" onPress={() => { setMenu(false); setUserId(null); }} style={{ paddingHorizontal: 16, height: 46, justifyContent: "center" }}>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: 16, color: C.text }}>Back to welcome</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
       </View>
 
       <View style={{ marginTop: 18, marginBottom: 6 }}>
