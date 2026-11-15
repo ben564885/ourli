@@ -25,7 +25,7 @@ export default function Creators() {
           key={d.dayId}
           testID={"creator-" + d.joinCode}
           onPress={() => router.push((d.joined ? "/day/" + d.dayId : "/c/" + d.joinCode) as any)}
-          style={({ pressed }) => ({ borderRadius: 30, padding: 14, gap: 14, backgroundColor: C.card, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, transform: [{ scale: pressed ? 0.985 : 1 }] })}>
+          style={({ pressed }) => ({ borderRadius: 30, padding: 14, gap: 14, backgroundColor: C.card, transform: [{ scale: pressed ? 0.985 : 1 }] })}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Avatar name={d.creator?.name ?? "?"} color={d.creator?.color ?? C.accent} avatarUrl={d.creator?.avatarUrl} size={40} />
             <View style={{ flex: 1 }}>

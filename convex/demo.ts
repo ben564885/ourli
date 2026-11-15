@@ -265,8 +265,8 @@ export const setCreatorAvatar = internalMutation({
 const COLORS = ["#7C83FD", "#FF8FAB", "#FFB86B", "#5EE6A8", "#6BC5FF", "#C38BFF", "#FFD166"];
 
 export const joinDemo = mutation({
-  args: { name: v.string(), avatarId: v.optional(v.id("_storage")) },
-  handler: async (ctx, { name, avatarId }) => {
+  args: { name: v.string(), avatarId: v.optional(v.id("_storage")), localHour: v.optional(v.number()), date: v.optional(v.string()) },
+  handler: async (ctx, { name, avatarId, localHour, date }) => {
     const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
     if (!group) throw new Error("Demo group is not seeded");
     const all = await demoGroups(ctx);
@@ -282,7 +282,33 @@ export const joinDemo = mutation({
     const userId = await ctx.db.insert("users", { name: name.trim().slice(0, 32), color: COLORS[Math.floor(Math.random() * COLORS.length)], avatarId });
     for (const gr of all) await ctx.db.insert("groupMembers", { groupId: gr._id, userId });
     await ctx.scheduler.runAfter(0, internal.demo.backfillUser, { groupId: group._id, userId });
-    return { userId, groupId: group._id };
+
+    const nowMs = Date.now();
+    const slotMs = 3600_000;
+    const startAt = Math.floor(nowMs / slotMs) * slotMs - 2 * slotMs;
+    const hour = localHour ?? new Date().getHours();
+    const startHour = Math.min(Math.max(0, hour - 2), 18);
+    const dayDate = date ?? ymd(new Date());
+    const pool = (await ctx.db.query("captures").take(60)).map((c) => c.storageId);
+    let mainDay: Id<"days"> | null = null;
+    for (const gr of all) {
+      for (const old of await ctx.db.query("days").withIndex("by_group", (q) => q.eq("groupId", gr._id)).filter((q) => q.eq(q.field("status"), "active")).collect()) {
+        await ctx.db.patch(old._id, { status: "done" });
+      }
+      const dayId = await ctx.db.insert("days", { groupId: gr._id, date: dayDate, startHour, endHour: startHour + 6, startAt, slotMs, hourCount: 6, status: "active", type: "group" });
+      await ctx.scheduler.runAt(startAt + 6 * slotMs, internal.days.finish, { dayId });
+      const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", gr._id)).collect();
+      for (const m of members) {
+        for (let h = 0; h < 3; h++) {
+          if (h === 2 && m.userId === userId) continue;
+          const s = pick(pool);
+          await ctx.db.insert("captures", { dayId, userId: m.userId, hourIndex: h, storageId: s, thumbId: s, takenAt: startAt + h * slotMs + Math.floor(Math.random() * 40 + 5) * 60_000 });
+        }
+      }
+      await ctx.db.patch(dayId, { coverPhotoId: pick(pool) });
+      if (gr._id === group._id) mainDay = dayId;
+    }
+    return { userId, groupId: group._id, dayId: mainDay };
   },
 });
 

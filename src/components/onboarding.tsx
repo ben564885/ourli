@@ -3,6 +3,7 @@ import Animated2, { FadeIn, FadeOut } from "react-native-reanimated";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 import { uploadAvatar } from "@/lib/upload";
+import { localDate } from "@/lib/time";
 import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -73,8 +74,10 @@ export function Onboarding() {
       const avatarId = photo ? await uploadAvatar(photo, () => genUrl()) : undefined;
       const typed = code.trim().toUpperCase();
       if (!typed || typed === "OURLI1") {
-        const res = await joinDemo({ name, avatarId });
+        const now = new Date();
+        const res = await joinDemo({ name, avatarId, localHour: now.getHours(), date: localDate(now) });
         await setUserId(res.userId);
+        if (res.dayId) router.push(("/day/" + res.dayId) as any);
         return;
       }
       const id = await create({ name, avatarId });
