@@ -26,15 +26,14 @@ export const seedGroup = action({
       const startHour = 12;
       const hourCount = 4;
       const startAt = d.getTime() + startHour * 3600_000;
-      const captures: { userId: Id<"users">; hourIndex: number; storageId: Id<"_storage">; thumbId: Id<"_storage">; takenAt: number }[] = [];
-      for (let h = 0; h < hourCount; h++) {
-        for (const m of members) {
-          if (Math.random() < 0.12) continue;
-          const seed = "ourli-" + date + "-" + h + "-" + m;
-          const [storageId, thumbId] = await Promise.all([storeImage(ctx, seed, 720, 960), storeImage(ctx, seed, 180, 240)]);
-          captures.push({ userId: m, hourIndex: h, storageId, thumbId, takenAt: startAt + h * 3600_000 + Math.floor(Math.random() * 50) * 60_000 });
-        }
-      }
+      const slots = [];
+      for (let h = 0; h < hourCount; h++) for (const m of members) if (Math.random() >= 0.12) slots.push({ h, m });
+      const captures = await Promise.all(
+        slots.map(async ({ h, m }) => {
+          const storageId = await storeImage(ctx, "ourli-" + date + "-" + h + "-" + m, 360, 480);
+          return { userId: m, hourIndex: h, storageId, thumbId: storageId, takenAt: startAt + h * 3600_000 + Math.floor(Math.random() * 50) * 60_000 };
+        }),
+      );
       const ok = await ctx.runMutation(internal.seed.insertDay, { groupId, date, startHour, hourCount, startAt, captures });
       if (ok) created++;
     }
@@ -72,7 +71,6 @@ export const insertDay = internalMutation({
     if (existing) {
       for (const c of a.captures) {
         await ctx.storage.delete(c.storageId);
-        await ctx.storage.delete(c.thumbId);
       }
       return false;
     }
