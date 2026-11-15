@@ -261,3 +261,23 @@ export const seedRange = internalMutation({
     return "seeded " + n + " days";
   },
 });
+
+export const clearRange = internalMutation({
+  args: { from: v.number(), to: v.number() },
+  handler: async (ctx, { from, to }) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) return "no group";
+    const now = new Date();
+    let n = 0;
+    for (let off = from; off <= to; off++) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off);
+      const date = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      for (const day of await ctx.db.query("days").withIndex("by_group_date", (q) => q.eq("groupId", group._id).eq("date", date)).collect()) {
+        for (const c of await ctx.db.query("captures").withIndex("by_day", (q) => q.eq("dayId", day._id)).collect()) await ctx.db.delete(c._id);
+        await ctx.db.delete(day._id);
+        n++;
+      }
+    }
+    return "cleared " + n;
+  },
+});
