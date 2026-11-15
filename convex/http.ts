@@ -87,17 +87,7 @@ http.route({
         headers: { Authorization: "Bearer " + process.env.WHOP_API_KEY },
       });
       if (!accessRes.ok) throw new Error("access " + accessRes.status + " " + (await accessRes.text()));
-      let access = await accessRes.json();
-      if (!access.has_access) {
-        const invite = await fetch(WHOP_API + "/memberships/invite", {
-          method: "POST",
-          headers: { Authorization: "Bearer " + process.env.WHOP_API_KEY, "Content-Type": "application/json" },
-          body: JSON.stringify({ plan_id: process.env.WHOP_PLAN_ID ?? "plan_CP6L8nLZEpYib", user_id: me.id }),
-        });
-        if (!invite.ok) console.error("whop invite failed", invite.status, await invite.text());
-        const again = await fetch(WHOP_API + "/users/" + me.id + "/access/" + productId, { headers: { Authorization: "Bearer " + process.env.WHOP_API_KEY } });
-        if (again.ok) access = await again.json();
-      }
+      const access = await accessRes.json();
       if (!access.has_access) return redirect(row.returnTo, { whop: "no_access", name: me.username ?? "" });
       await ctx.runMutation(internal.creator.addVerifiedFan, { dayId: row.dayId, userId: row.userId, whopUserId: me.id });
       return redirect(row.returnTo, { whop: "ok", name: me.username ?? me.name ?? "" });

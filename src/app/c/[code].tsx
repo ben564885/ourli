@@ -207,7 +207,7 @@ export default function CreatorJoin() {
 
             <View style={{ flexDirection: "row", justifyContent: "center", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
               {!isCreator && !joined && <Text onPress={() => Linking.openURL(PASS_URL)} style={linkStyle}>Get the free pass</Text>}
-              {!isCreator && !joined && !whop.configured && (
+              {!isCreator && !joined && (!whop.configured || status === "no_access" || status === "error") && (
                 <>
                   <Text style={linkStyle}>·</Text>
                   <Text
