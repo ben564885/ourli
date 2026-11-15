@@ -263,6 +263,7 @@ export function Landing() {
     if (Platform.OS !== "web") return;
     const node = scroller.current?.getScrollableNode?.() as HTMLElement | undefined;
     if (!node) return;
+    delete (node as any).scrollTo;
     const instance = new Lenis({ wrapper: node, content: node.firstElementChild as HTMLElement, lerp: 0.09, smoothWheel: true });
     lenis.current = instance;
     let raf = 0;
