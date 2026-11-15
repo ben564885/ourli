@@ -123,7 +123,7 @@ export function Onboarding() {
           <View style={{ gap: 12, marginTop: 36, paddingHorizontal: 24 }}>
             <TextInput testID="name-input" placeholder="Your name" placeholderTextColor={C.faint} value={name} onChangeText={setName} style={s.input} autoFocus />
             {step === "code" && (
-              <TextInput testID="onboard-code-input" placeholder="Invite code" autoCapitalize="characters" placeholderTextColor={C.faint} value={code} onChangeText={setCode} style={s.input} />
+              <TextInput testID="onboard-code-input" placeholder="JUDGES USE OURLI1" autoCapitalize="characters" placeholderTextColor={C.faint} value={code} onChangeText={setCode} style={s.input} />
             )}
           </View>
         )}
