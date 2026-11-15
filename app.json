@@ -9,8 +9,9 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.ourli.app",
-      "supportsTablet": false
+      "bundleIdentifier": "com.ourlihack.app",
+      "supportsTablet": false,
+      "appleTeamId": "XJ9WN9LVL3"
     },
     "android": {
       "adaptiveIcon": {
@@ -50,7 +51,7 @@
           "photosPermission": "ourli lets you pick a photo for this hour."
         }
       ],
-      "expo-notifications"
+      "./plugins/without-push"
     ],
     "experiments": {
       "typedRoutes": true,

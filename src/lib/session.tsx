@@ -5,9 +5,12 @@ import { Id } from "@convex/_generated/dataModel";
 
 const KEY = "ourli_user_id";
 
+const memory: { value: string | null } = { value: null };
+
 async function read() {
   if (Platform.OS === "web") return globalThis.localStorage?.getItem(KEY) ?? null;
-  return SecureStore.getItemAsync(KEY);
+  const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500));
+  return Promise.race([SecureStore.getItemAsync(KEY).catch(() => memory.value), timeout]);
 }
 
 async function write(value: string | null) {
@@ -16,8 +19,11 @@ async function write(value: string | null) {
     else globalThis.localStorage?.removeItem(KEY);
     return;
   }
-  if (value) await SecureStore.setItemAsync(KEY, value);
-  else await SecureStore.deleteItemAsync(KEY);
+  memory.value = value;
+  try {
+    if (value) await SecureStore.setItemAsync(KEY, value);
+    else await SecureStore.deleteItemAsync(KEY);
+  } catch {}
 }
 
 type Session = { userId: Id<"users"> | null; loading: boolean; setUserId: (id: Id<"users"> | null) => Promise<void> };
