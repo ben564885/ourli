@@ -9,11 +9,12 @@ import { useSession } from "@/lib/session";
 import { Avatar, Loading, Pill } from "@/components/ui";
 import { Onboarding } from "@/components/onboarding";
 import { Landing } from "@/components/landing";
-import { F } from "@/lib/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { C, F, useTheme } from "@/lib/theme";
 import { dayClock, formatCountdown, hourLabel, monthKey } from "@/lib/time";
 import { useNow } from "@/lib/use-now";
 
-const K = { bg: "#0B0B0D", card: "#16171A", text: "#FFFFFF", muted: "#9A9CA3", line: "#3A3B41", sky: "#14263A", skyLine: "#2E5784" };
+const K = C;
 
 function DCard({ children, style, onPress }: { children: React.ReactNode; style?: object; onPress?: () => void }) {
   return (
@@ -46,6 +47,7 @@ function ActiveBanner({ day }: { day: any }) {
 function HomeScreen() {
   const { userId, loading, setUserId } = useSession();
   const [menu, setMenu] = useState(false);
+  const { mode, toggle } = useTheme();
   const user = useQuery(api.users.get, userId ? { userId } : "skip");
   const active = useQuery(api.days.activeForUser, userId ? { userId } : "skip");
   const recent = useQuery(api.days.byMonth, userId ? { userId, month: monthKey(new Date()) } : "skip") as
@@ -63,12 +65,15 @@ function HomeScreen() {
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 130, gap: 16 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Text style={{ fontSize: 34, fontFamily: F.sansBold, color: K.text, letterSpacing: -1.4 }}>ourli</Text>
-        <View style={{ zIndex: 20 }}>
+        <View style={{ zIndex: 20, flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <Pressable testID="theme-toggle" accessibilityLabel="Toggle theme" onPress={toggle} style={{ width: 40, height: 40, borderRadius: 20, borderWidth: 1.5, borderStyle: "dashed", borderColor: K.line, alignItems: "center", justifyContent: "center" }}>
+            <Ionicons name={mode === "dark" ? "sunny-outline" : "moon-outline"} size={20} color={K.text} />
+          </Pressable>
           <Pressable testID="avatar" accessibilityLabel="Profile menu" onPress={() => setMenu((m) => !m)}>
             <Avatar name={user.name} color={user.color} avatarUrl={user.avatarUrl} />
           </Pressable>
           {menu && (
-            <View style={{ position: "absolute", top: 46, right: 0, width: 200, backgroundColor: "#1B1C20", borderRadius: 20, borderWidth: 1.5, borderStyle: "dashed", borderColor: K.line, paddingVertical: 6, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}>
+            <View style={{ position: "absolute", top: 46, right: 0, width: 200, backgroundColor: C.card, borderRadius: 20, borderWidth: 1.5, borderStyle: "dashed", borderColor: K.line, paddingVertical: 6, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}>
               <Text style={{ fontFamily: F.sans, fontSize: 13, color: K.muted, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>{user.name}</Text>
               <Pressable testID="back-to-welcome" onPress={() => { setMenu(false); setUserId(null); }} style={{ paddingHorizontal: 16, height: 46, justifyContent: "center" }}>
                 <Text style={{ fontFamily: F.sansMedium, fontSize: 16, color: K.text }}>Back to welcome</Text>

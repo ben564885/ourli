@@ -6,7 +6,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import { useSession } from "@/lib/session";
-import { C } from "@/lib/theme";
+import { C, useTheme } from "@/lib/theme";
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -46,7 +46,7 @@ type BottomTabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs
 function GlassTabBar({ state, descriptors, emitter, navigateToTab, insets }: BottomTabBarProps) {
   const { bottom } = insets;
   const glass = Platform.OS === "ios" && isLiquidGlassAvailable();
-  const dark = ["index", "calendar"].includes(state.routes[state.index].name);
+  const dark = useTheme().mode === "dark";
   const Wrap: any = glass ? GlassView : BlurView;
   const wrapProps = glass ? { glassEffectStyle: "regular", colorScheme: dark ? "dark" : "light" } : { intensity: 70, tint: dark ? "systemChromeMaterialDark" : "systemChromeMaterialLight" };
   return (

@@ -17,7 +17,7 @@ const SITE = process.env.EXPO_PUBLIC_CONVEX_SITE_URL!;
 const WEB = process.env.EXPO_PUBLIC_WEB_URL;
 const PASS_URL = "https://whop.com/checkout/plan_CP6L8nLZEpYib";
 const CREATOR_PHOTO = require("../../../assets/images/creator.jpg");
-const PAPER = "#F1F1F6";
+const PAPER = C.cardHi;
 
 const MESSAGES: Record<string, string> = {
   no_access: "That Whop account doesn't have the pass yet. Grab it free, then try again.",
@@ -38,7 +38,7 @@ function Fade() {
 
 function Tile({ label, value, size }: { label: string; value: string; size: number }) {
   return (
-    <View style={{ width: size, height: size * 0.78, borderRadius: 22, backgroundColor: "#E8E8EE", alignItems: "center", justifyContent: "center", gap: 4 }}>
+    <View style={{ width: size, height: size * 0.78, borderRadius: 22, backgroundColor: C.hair, alignItems: "center", justifyContent: "center", gap: 4 }}>
       <Text style={{ fontFamily: F.sansMedium, fontSize: 22, color: C.text }}>{value}</Text>
       <Text style={{ fontFamily: F.sans, fontSize: 11, letterSpacing: 0.5, color: C.muted }}>{label}</Text>
     </View>
@@ -114,7 +114,7 @@ export default function CreatorJoin() {
     </Pressable>
   );
 
-  const linkStyle = { fontFamily: F.sansMedium, fontSize: 15, color: "#5C6270" } as const;
+  const linkStyle = { fontFamily: F.sansMedium, fontSize: 15, color: C.muted } as const;
 
   return (
     <View style={{ flex: 1, backgroundColor: PAPER }} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
@@ -122,13 +122,13 @@ export default function CreatorJoin() {
         <ScrollView contentContainerStyle={{ alignItems: "center", paddingBottom: 0 }} showsVerticalScrollIndicator={false}>
           <View style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center", paddingTop: 10, height: 64 }}>
             <Logo size={26} />
-            <Pressable accessibilityLabel="Close" onPress={() => (router.canGoBack() ? router.back() : router.replace("/creators" as any))} style={{ position: "absolute", right: 20, top: 10, width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: "#D9D9E0", backgroundColor: "#F7F7FA", alignItems: "center", justifyContent: "center" }}>
+            <Pressable accessibilityLabel="Close" onPress={() => (router.canGoBack() ? router.back() : router.replace("/creators" as any))} style={{ position: "absolute", right: 20, top: 10, width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: C.hair, backgroundColor: C.card, alignItems: "center", justifyContent: "center" }}>
               <Text style={{ fontSize: 22, color: C.text, marginTop: -2 }}>×</Text>
             </Pressable>
           </View>
 
-          <View style={{ width: frameW, height: 360, marginTop: 24, borderTopLeftRadius: 52, borderTopRightRadius: 52, borderWidth: 8, borderBottomWidth: 0, borderColor: "#E6E6EC", overflow: "hidden", alignItems: "center", paddingTop: 14 }}>
-            <View style={{ width: 96, height: 26, borderRadius: 14, backgroundColor: "#E6E6EC" }} />
+          <View style={{ width: frameW, height: 360, marginTop: 24, borderTopLeftRadius: 52, borderTopRightRadius: 52, borderWidth: 8, borderBottomWidth: 0, borderColor: C.hair, overflow: "hidden", alignItems: "center", paddingTop: 14 }}>
+            <View style={{ width: 96, height: 26, borderRadius: 14, backgroundColor: C.hair }} />
             <View style={{ flexDirection: "row", gap: 10, marginTop: 26 }}>
               <Tile size={tile} value={String(day.hourCount)} label="HOURS" />
               <Tile size={tile} value={String(day.fanCount)} label={day.fanCount === 1 ? "FAN" : "FANS"} />
@@ -151,12 +151,12 @@ export default function CreatorJoin() {
             <Text style={{ fontFamily: F.sansMedium, fontSize: 40, lineHeight: 46, letterSpacing: -1.2, textAlign: "center", color: C.text }}>
               Spend the day{"\n"}with {creatorName}
             </Text>
-            <Text style={{ fontFamily: F.sans, fontSize: 18, lineHeight: 26, color: "#A3A6AD", textAlign: "center", marginTop: 14 }}>
+            <Text style={{ fontFamily: F.sans, fontSize: 18, lineHeight: 26, color: C.faint, textAlign: "center", marginTop: 14 }}>
               Live {hourLabel(day.startHour)}–{hourLabel(day.endHour)}. Every hour you see their photo next to yours, and tonight you get a recap of your day together.
             </Text>
             <View style={{ flexDirection: "row", gap: 14, marginTop: 24, marginBottom: 22 }}>
               {[0, 1, 2, 3].map((i) => (
-                <View key={i} style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: i === 0 ? C.text : "#D2D3D8" }} />
+                <View key={i} style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: i === 0 ? C.text : C.hair }} />
               ))}
             </View>
           </View>
@@ -171,7 +171,7 @@ export default function CreatorJoin() {
             {isCreator ? (
               <View style={{ alignItems: "center", gap: 12 }}>
                 {webLink.startsWith("http") && (
-                  <View style={{ padding: 12, backgroundColor: "#fff", borderRadius: 18, borderWidth: 1, borderColor: "#ECECF0" }}>
+                  <View style={{ padding: 12, backgroundColor: "#fff", borderRadius: 18, borderWidth: 1, borderColor: C.hair }}>
                     <QRCode value={webLink} size={180} />
                   </View>
                 )}
@@ -189,12 +189,12 @@ export default function CreatorJoin() {
                     placeholderTextColor={C.faint}
                     value={name}
                     onChangeText={setName}
-                    style={{ backgroundColor: "#F4F4F8", color: C.text, borderRadius: 999, height: 56, paddingHorizontal: 22, fontSize: 17, fontFamily: F.sans }}
+                    style={{ backgroundColor: C.card, color: C.text, borderRadius: 999, height: 56, paddingHorizontal: 22, fontSize: 17, fontFamily: F.sans }}
                   />
                 )}
                 {cta("Join with Whop", joinWithWhop, !userId && !name.trim(), "join-whop")}
                 <Text style={{ fontFamily: F.sans, fontSize: 15, lineHeight: 22, textAlign: "center", color: C.muted }}>
-                  <Text style={{ color: "#3D414A", fontFamily: F.sansMedium }}>Free pass · $0. </Text>
+                  <Text style={{ color: C.muted, fontFamily: F.sansMedium }}>Free pass · $0. </Text>
                   We check your Whop account has access, then you're in.
                 </Text>
               </>

@@ -3,7 +3,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
-import { C, F, R } from "@/lib/theme";
+import { C, F, R, themed } from "@/lib/theme";
 
 export function Screen({ children, scroll = true, style }: { children: ReactNode; scroll?: boolean; style?: ViewStyle }) {
   return (
@@ -63,7 +63,7 @@ export function Button({
       onPress={onPress}
       disabled={disabled || loading}
       style={({ pressed }) => [s.btn, { backgroundColor: bg, opacity: disabled ? 0.4 : pressed ? 0.8 : 1 }, style]}>
-      {loading ? <ActivityIndicator color={variant === "secondary" || variant === "ghost" ? C.text : "#fff"} /> : <Text style={[s.btnText, (variant === "ghost" || variant === "secondary") && { color: C.text }]}>{title}</Text>}
+      {loading ? <ActivityIndicator color={variant === "secondary" || variant === "ghost" ? C.text : C.onAccent} /> : <Text style={[s.btnText, (variant === "ghost" || variant === "secondary") && { color: C.text }]}>{title}</Text>}
     </Pressable>
   );
 }
@@ -108,14 +108,14 @@ export function Pill({ text, color = C.accent }: { text: string; color?: string 
   );
 }
 
-const s = StyleSheet.create({
+const s = themed(() => StyleSheet.create({
   h1: { color: C.text, fontSize: 40, lineHeight: 44, fontFamily: F.sansMedium, letterSpacing: -1.5 },
   h2: { color: C.text, fontSize: 22, fontFamily: F.sansMedium, letterSpacing: -0.5 },
   body: { color: C.text, fontSize: 15, lineHeight: 21, fontFamily: F.sans },
   btn: { height: 56, borderRadius: 999, alignItems: "center", justifyContent: "center", paddingHorizontal: 22 },
-  btnText: { color: "#fff", fontSize: 17, fontFamily: F.sansMedium },
+  btnText: { color: C.onAccent, fontSize: 17, fontFamily: F.sansMedium },
   card: { backgroundColor: C.bg, borderRadius: 28, padding: 18, gap: 12, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line },
-});
+}));
 
 export function Display({ lead, accent, tail, size = 40 }: { lead?: string; accent: string; tail?: string; size?: number }) {
   return (

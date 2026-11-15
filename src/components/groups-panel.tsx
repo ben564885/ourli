@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { Body, Button, Card, H2, Pill } from "./ui";
-import { C, F } from "@/lib/theme";
+import { C, F, themed } from "@/lib/theme";
 
 export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"users">; title?: string }) {
   const groups = useQuery(api.groups.mine, { userId });
@@ -61,6 +61,6 @@ export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"use
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   input: { backgroundColor: C.bg, color: C.text, borderRadius: 999, height: 54, paddingHorizontal: 20, fontSize: 17, fontFamily: F.sans, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line },
-});
+}));

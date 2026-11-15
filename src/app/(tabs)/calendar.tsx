@@ -7,10 +7,10 @@ import { Image } from "expo-image";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useSession } from "@/lib/session";
-import { F } from "@/lib/theme";
+import { C, F } from "@/lib/theme";
 import { localDate, monthKey, pad } from "@/lib/time";
 
-const K = { bg: "#0B0B0D", text: "#FFFFFF", muted: "#8B8D94", faint: "#4A4C53", line: "#1F2024", accentSoft: "#9DB8F0" };
+const K = C;
 const WEEKDAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -57,17 +57,17 @@ function Month({ year, month, cell, userId, groupId, onToday }: { year: number; 
               onPress={() => entry && router.push(("/recap/" + entry.dayId) as any)}
               style={{ width: cell, height: cell + 12, alignItems: "center", justifyContent: "center" }}>
               {hasPhoto ? (
-                <View style={{ width: tile, height: tile, borderRadius: 11, overflow: "hidden", borderWidth: isToday ? 2.5 : 0, borderColor: "#fff" }}>
+                <View style={{ width: tile, height: tile, borderRadius: 11, overflow: "hidden", borderWidth: isToday ? 2.5 : 0, borderColor: C.text }}>
                   <Image source={{ uri: entry!.coverPhotoUrl! }} style={{ width: "100%", height: "100%" }} contentFit="cover" transition={150} />
                   <View style={{ position: "absolute", inset: 0, backgroundColor: "rgba(0,0,0,0.5)" }} />
                 </View>
               ) : isToday ? (
-                <View style={{ width: tile, height: tile, borderRadius: tile / 2, backgroundColor: "#fff" }} />
+                <View style={{ width: tile, height: tile, borderRadius: tile / 2, backgroundColor: C.text }} />
               ) : null}
               <Text
                 style={{
                   position: "absolute",
-                  color: isToday && !hasPhoto ? "#000" : hasPhoto ? "#fff" : inMonth ? K.text : K.faint,
+                  color: isToday && !hasPhoto ? C.bg : hasPhoto ? "#fff" : inMonth ? K.text : K.faint,
                   opacity: inMonth ? 1 : 0.5,
                   fontSize: 16,
                   fontFamily: isToday ? F.sansBold : F.sansMedium,
@@ -113,8 +113,8 @@ export default function Calendar() {
             {DAYS[now.getDay()]}, {MONTHS[now.getMonth()].slice(0, 3)} {now.getDate()}
           </Text>
         </View>
-        <Pressable testID="cal-today" onPress={() => goToday(true)} style={{ height: 38, paddingHorizontal: 16, borderRadius: 999, backgroundColor: "#fff", justifyContent: "center" }}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: 14, color: "#000" }}>Today</Text>
+        <Pressable testID="cal-today" onPress={() => goToday(true)} style={{ height: 38, paddingHorizontal: 16, borderRadius: 999, backgroundColor: C.text, justifyContent: "center" }}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: 14, color: C.bg }}>Today</Text>
         </Pressable>
       </View>
       <ScrollView ref={scroll} contentContainerStyle={{ paddingHorizontal: cardPad, paddingBottom: 130, paddingTop: 12 }}>

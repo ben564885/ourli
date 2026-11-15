@@ -9,7 +9,7 @@ import { router } from "expo-router";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
-import { C, F } from "@/lib/theme";
+import { C, F, themed } from "@/lib/theme";
 import { Button } from "./ui";
 
 type Chip = { t: string; emoji?: boolean; filled?: boolean };
@@ -160,7 +160,7 @@ export function Onboarding() {
   );
 }
 
-const s = StyleSheet.create({
+const s = themed(() => StyleSheet.create({
   h1: { fontFamily: F.sansMedium, fontSize: 50, lineHeight: 54, letterSpacing: -1.8, color: C.text, textAlign: "center" },
   h1Serif: { fontFamily: F.serifItalic, fontSize: 52, lineHeight: 54, letterSpacing: -1, color: C.text, textAlign: "center" },
   sub: { fontFamily: F.sansMedium, fontSize: 15, color: C.text, marginTop: 18, textAlign: "center" },
@@ -171,4 +171,4 @@ const s = StyleSheet.create({
   chipText: { fontFamily: F.serif, fontSize: 17, color: C.text },
   input: { backgroundColor: C.bg, color: C.text, borderRadius: 999, height: 56, paddingHorizontal: 22, fontSize: 17, fontFamily: F.sans, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line },
   link: { fontFamily: F.sansMedium, fontSize: 16, color: C.text },
-});
+}));
