@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
 import { Avatar, Body, Button, Card, H2, Loading, Logo, Pill, Screen } from "@/components/ui";
 import { Onboarding } from "@/components/onboarding";
+import { Landing } from "@/components/landing";
 import { C, F } from "@/lib/theme";
 import { dayClock, formatCountdown, hourLabel } from "@/lib/time";
 import { useNow } from "@/lib/use-now";
@@ -30,7 +31,7 @@ function ActiveBanner({ day }: { day: any }) {
   );
 }
 
-export default function Home() {
+function HomeScreen() {
   const { userId, loading, setUserId } = useSession();
   const user = useQuery(api.users.get, userId ? { userId } : "skip");
   const groups = useQuery(api.groups.mine, userId ? { userId } : "skip");
@@ -125,3 +126,9 @@ export default function Home() {
 const styles = StyleSheet.create({
   input: { backgroundColor: C.cardHi, color: C.text, borderRadius: 14, height: 50, paddingHorizontal: 16, fontSize: 16 },
 });
+
+export default function Index() {
+  const { userId, loading } = useSession();
+  if (Platform.OS === "web" && !loading && !userId) return <Landing />;
+  return <HomeScreen />;
+}
