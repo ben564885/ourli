@@ -46,11 +46,12 @@ type BottomTabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs
 function GlassTabBar({ state, descriptors, emitter, navigateToTab, insets }: BottomTabBarProps) {
   const { bottom } = insets;
   const glass = Platform.OS === "ios" && isLiquidGlassAvailable();
+  const dark = ["index", "calendar"].includes(state.routes[state.index].name);
   const Wrap: any = glass ? GlassView : BlurView;
-  const wrapProps = glass ? { glassEffectStyle: "regular" } : { intensity: 70, tint: "systemChromeMaterialLight" };
+  const wrapProps = glass ? { glassEffectStyle: "regular", colorScheme: dark ? "dark" : "light" } : { intensity: 70, tint: dark ? "systemChromeMaterialDark" : "systemChromeMaterialLight" };
   return (
     <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(bottom, 12) + 4, alignItems: "center" }}>
-      <Wrap {...wrapProps} style={{ width: "86%", maxWidth: 380, height: 64, borderRadius: 32, overflow: "hidden", flexDirection: "row", alignItems: "center", paddingHorizontal: 8, backgroundColor: glass ? undefined : "rgba(255,255,255,0.6)" }}>
+      <Wrap {...wrapProps} style={{ width: "86%", maxWidth: 380, height: 64, borderRadius: 32, overflow: "hidden", flexDirection: "row", alignItems: "center", paddingHorizontal: 8, backgroundColor: glass ? undefined : dark ? "rgba(20,20,22,0.6)" : "rgba(255,255,255,0.6)" }}>
         {state.routes.map((route, i) => {
           const { options } = descriptors[route.key];
           const focused = state.index === i;
@@ -61,7 +62,7 @@ function GlassTabBar({ state, descriptors, emitter, navigateToTab, insets }: Bot
           if (route.name === "create") return <PlusButton key={route.key} onPress={press} />;
           return (
             <Pressable key={route.key} accessibilityLabel={options.title} testID={"tab-" + route.name} onPress={() => { Haptics.selectionAsync(); press(); }} style={{ flex: 1, height: 64, alignItems: "center", justifyContent: "center" }}>
-              {options.tabBarIcon?.({ focused, color: focused ? C.text : "#6B6B75", size: 26 })}
+              {options.tabBarIcon?.({ focused, color: dark ? (focused ? "#FFFFFF" : "rgba(255,255,255,0.72)") : focused ? C.text : "#6B6B75", size: 26 })}
             </Pressable>
           );
         })}

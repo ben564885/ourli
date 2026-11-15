@@ -1,34 +1,45 @@
 import { useState } from "react";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
-import { Avatar, Body, Card, Display, H2, Loading, Logo, Pill, Screen } from "@/components/ui";
+import { Avatar, Loading, Pill } from "@/components/ui";
 import { Onboarding } from "@/components/onboarding";
 import { Landing } from "@/components/landing";
-import { C, F } from "@/lib/theme";
+import { F } from "@/lib/theme";
 import { dayClock, formatCountdown, hourLabel, monthKey } from "@/lib/time";
 import { useNow } from "@/lib/use-now";
+
+const K = { bg: "#0B0B0D", card: "#16171A", text: "#FFFFFF", muted: "#9A9CA3", line: "#3A3B41", sky: "#14263A", skyLine: "#2E5784" };
+
+function DCard({ children, style, onPress }: { children: React.ReactNode; style?: object; onPress?: () => void }) {
+  return (
+    <Pressable disabled={!onPress} onPress={onPress} style={({ pressed }) => [{ backgroundColor: K.bg, borderRadius: 28, padding: 18, gap: 12, borderWidth: 1.5, borderStyle: "dashed", borderColor: K.line, opacity: pressed ? 0.85 : 1 }, style]}>
+      {children}
+    </Pressable>
+  );
+}
 
 function ActiveBanner({ day }: { day: any }) {
   const now = useNow();
   const clock = dayClock(day, now);
   const label = day.type === "creator" ? (day.title ?? "Creator Day") : day.groupName;
   return (
-    <Card style={{ backgroundColor: C.sky, borderColor: C.skyLine }} onPress={() => router.push(("/day/" + day._id) as any)}>
+    <DCard style={{ backgroundColor: K.sky, borderColor: K.skyLine }} onPress={() => router.push(("/day/" + day._id) as any)}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Text style={{ color: C.text, fontFamily: F.sansMedium, fontSize: 20 }}>{label}</Text>
-        {day.type === "creator" && <Pill text="Creator Day" color={C.text} />}
+        <Text style={{ color: K.text, fontFamily: F.sansMedium, fontSize: 20 }}>{label}</Text>
+        {day.type === "creator" && <Pill text="Creator Day" color={K.text} />}
       </View>
-      <Text style={{ color: C.muted, fontFamily: F.serif, fontSize: 17 }}>
+      <Text style={{ color: K.muted, fontFamily: F.serif, fontSize: 17 }}>
         {clock.notStarted
           ? "Starts in " + formatCountdown(clock.msLeft)
           : hourLabel(day.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + day.hourCount + " · next in " + formatCountdown(clock.msLeft)}
       </Text>
-      <Text style={{ color: C.text, fontFamily: F.serifItalic, fontSize: 18 }}>Open Day →</Text>
-    </Card>
+      <Text style={{ color: K.text, fontFamily: F.serifItalic, fontSize: 18 }}>Open Day →</Text>
+    </DCard>
   );
 }
 
@@ -48,18 +59,19 @@ function HomeScreen() {
   const feed = (recent ?? []).filter((d) => d.coverPhotoUrl).sort((a, b) => (a.date < b.date ? 1 : -1));
 
   return (
-    <Screen>
+    <SafeAreaView style={{ flex: 1, backgroundColor: K.bg }} edges={["top", "left", "right"]}>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 130, gap: 16 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Logo />
+        <Text style={{ fontSize: 34, fontFamily: F.sansBold, color: K.text, letterSpacing: -1.4 }}>ourli</Text>
         <View style={{ zIndex: 20 }}>
           <Pressable testID="avatar" accessibilityLabel="Profile menu" onPress={() => setMenu((m) => !m)}>
             <Avatar name={user.name} color={user.color} avatarUrl={user.avatarUrl} />
           </Pressable>
           {menu && (
-            <View style={{ position: "absolute", top: 46, right: 0, width: 200, backgroundColor: C.bg, borderRadius: 20, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, paddingVertical: 6, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}>
-              <Text style={{ fontFamily: F.sans, fontSize: 13, color: C.muted, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>{user.name}</Text>
+            <View style={{ position: "absolute", top: 46, right: 0, width: 200, backgroundColor: "#1B1C20", borderRadius: 20, borderWidth: 1.5, borderStyle: "dashed", borderColor: K.line, paddingVertical: 6, shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}>
+              <Text style={{ fontFamily: F.sans, fontSize: 13, color: K.muted, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 }}>{user.name}</Text>
               <Pressable testID="back-to-welcome" onPress={() => { setMenu(false); setUserId(null); }} style={{ paddingHorizontal: 16, height: 46, justifyContent: "center" }}>
-                <Text style={{ fontFamily: F.sansMedium, fontSize: 16, color: C.text }}>Back to welcome</Text>
+                <Text style={{ fontFamily: F.sansMedium, fontSize: 16, color: K.text }}>Back to welcome</Text>
               </Pressable>
             </View>
           )}
@@ -67,21 +79,21 @@ function HomeScreen() {
       </View>
 
       <View style={{ marginTop: 18, marginBottom: 6 }}>
-        <Display lead="Hi," accent={user.name} />
-        <Text style={{ fontFamily: F.sansMedium, fontSize: 15, color: C.text, marginTop: 10 }}>No filters. Just your hours, together.</Text>
+        <Text style={{ color: K.text, fontSize: 40, lineHeight: 43, fontFamily: F.sansMedium, letterSpacing: -1.4 }}>Hi, <Text style={{ fontFamily: F.serifItalic, fontSize: 41.6 }}>{user.name}</Text></Text>
+        <Text style={{ fontFamily: F.sansMedium, fontSize: 15, color: K.text, marginTop: 10 }}>No filters. Just your hours, together.</Text>
       </View>
 
       {active?.map((d) => <ActiveBanner key={d._id} day={d} />)}
       {active?.length === 0 && (
-        <Card onPress={() => router.push("/create")}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: 19, color: C.text }}>No Day live right now</Text>
-          <Text style={{ fontFamily: F.serifItalic, fontSize: 17, color: C.muted }}>Start one with your friends →</Text>
-        </Card>
+        <DCard onPress={() => router.push("/create")}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: 19, color: K.text }}>No Day live right now</Text>
+          <Text style={{ fontFamily: F.serifItalic, fontSize: 17, color: K.muted }}>Start one with your friends →</Text>
+        </DCard>
       )}
 
-      <H2 style={{ marginTop: 14 }}>Recent Days</H2>
+      <Text style={{ marginTop: 14, color: K.text, fontSize: 22, fontFamily: F.sansMedium, letterSpacing: -0.5 }}>Recent Days</Text>
       {feed.length === 0 ? (
-        <Body muted>Your finished Days show up here, with a photo from each.</Body>
+        <Text style={{ color: K.muted, fontSize: 15, lineHeight: 21, fontFamily: F.sans }}>Your finished Days show up here, with a photo from each.</Text>
       ) : (
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
           {feed.map((d) => (
@@ -94,16 +106,17 @@ function HomeScreen() {
         </View>
       )}
       <View style={{ flexDirection: "row", gap: 12 }}>
-        <Card style={{ flex: 1 }} onPress={() => router.push("/groups")}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: 18, color: C.text }}>Groups</Text>
-          <Text style={{ fontFamily: F.serifItalic, fontSize: 16, color: C.muted }}>Join or create →</Text>
-        </Card>
-        <Card style={{ flex: 1, backgroundColor: C.sky, borderColor: C.skyLine }} onPress={() => router.push("/creators" as any)}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: 18, color: C.text }}>Creator Days</Text>
-          <Text style={{ fontFamily: F.serifItalic, fontSize: 16, color: C.muted }}>Preview hour one →</Text>
-        </Card>
+        <DCard style={{ flex: 1 }} onPress={() => router.push("/groups")}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: 18, color: K.text }}>Groups</Text>
+          <Text style={{ fontFamily: F.serifItalic, fontSize: 16, color: K.muted }}>Join or create →</Text>
+        </DCard>
+        <DCard style={{ flex: 1, backgroundColor: K.sky, borderColor: K.skyLine }} onPress={() => router.push("/creators" as any)}>
+          <Text style={{ fontFamily: F.sansMedium, fontSize: 18, color: K.text }}>Creator Days</Text>
+          <Text style={{ fontFamily: F.serifItalic, fontSize: 16, color: K.muted }}>Preview hour one →</Text>
+        </DCard>
       </View>
-    </Screen>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
