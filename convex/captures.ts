@@ -25,8 +25,6 @@ export const create = mutation({
       .withIndex("by_day_user_hour", (q) => q.eq("dayId", a.dayId).eq("userId", a.userId).eq("hourIndex", a.hourIndex))
       .unique();
     if (existing) {
-      await ctx.storage.delete(existing.storageId);
-      if (existing.thumbId) await ctx.storage.delete(existing.thumbId);
       await ctx.db.patch(existing._id, { storageId: a.storageId, thumbId: a.thumbId, takenAt: Date.now() });
       return existing._id;
     }

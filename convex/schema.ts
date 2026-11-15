@@ -11,6 +11,8 @@ export default defineSchema({
     name: v.string(),
     inviteCode: v.string(),
     demo: v.optional(v.boolean()),
+    color: v.optional(v.string()),
+    icon: v.optional(v.string()),
     createdBy: v.id("users"),
   }).index("by_invite", ["inviteCode"]),
   groupMembers: defineTable({

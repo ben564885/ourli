@@ -17,7 +17,7 @@ export default function Creators() {
     <Screen>
       <View style={{ marginTop: 8 }}>
         <Display lead="Creator" accent="Days" />
-        <Text style={{ fontFamily: F.sansMedium, fontSize: 15, color: C.text, marginTop: 10 }}>Spend the day with someone you follow. Hour one is on us.</Text>
+        <Text style={{ fontFamily: F.sansMedium, fontSize: 15, color: C.text, marginTop: 10 }}>Spend a day with someone you follow.</Text>
       </View>
       {feed.length === 0 && <Body muted>No creator Days are live yet.</Body>}
       {feed.map((d) => (
@@ -25,7 +25,7 @@ export default function Creators() {
           key={d.dayId}
           testID={"creator-" + d.joinCode}
           onPress={() => router.push((d.joined ? "/day/" + d.dayId : "/c/" + d.joinCode) as any)}
-          style={{ borderRadius: 28, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, padding: 14, gap: 12, backgroundColor: C.bg }}>
+          style={({ pressed }) => ({ borderRadius: 30, padding: 14, gap: 14, backgroundColor: C.card, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, transform: [{ scale: pressed ? 0.985 : 1 }] })}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Avatar name={d.creator?.name ?? "?"} color={d.creator?.color ?? C.accent} avatarUrl={d.creator?.avatarUrl} size={40} />
             <View style={{ flex: 1 }}>
@@ -57,7 +57,11 @@ export default function Creators() {
               ))}
             </View>
           </View>
-          <Text style={{ fontFamily: F.serifItalic, fontSize: 17, color: C.text }}>{d.joined ? "Open the Day →" : "Unlock the full day with Whop →"}</Text>
+          <View style={{ height: 54, borderRadius: 999, backgroundColor: d.joined ? C.sky : C.accent, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, paddingHorizontal: 20 }}>
+            {!d.joined && <MaterialCommunityIcons name="crown" size={20} color={C.onAccent} />}
+            <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: d.joined ? C.text : C.onAccent }}>{d.joined ? "Open the Day" : "Unlock full day"}</Text>
+            {!d.joined && <Text style={{ fontFamily: F.serifItalic, fontSize: 16, color: C.onAccent, opacity: 0.7 }}>free pass</Text>}
+          </View>
         </Pressable>
       ))}
     </Screen>

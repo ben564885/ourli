@@ -3,6 +3,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
+import { Ionicons } from "@expo/vector-icons";
 import { C, F, R, themed } from "@/lib/theme";
 
 export function Screen({ children, scroll = true, style }: { children: ReactNode; scroll?: boolean; style?: ViewStyle }) {
@@ -83,6 +84,14 @@ export function Avatar({ name, color, size = 36, avatarUrl }: { name: string; co
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ color: "#111", fontFamily: F.sansBold, fontSize: size * 0.42 }}>{name.slice(0, 1).toUpperCase()}</Text>
+    </View>
+  );
+}
+
+export function GroupBadge({ color, icon, size = 40 }: { color?: string | null; icon?: string | null; size?: number }) {
+  return (
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color ?? C.sky, alignItems: "center", justifyContent: "center" }}>
+      <Ionicons name={(icon ?? "people") as keyof typeof Ionicons.glyphMap} size={size * 0.5} color="#111" />
     </View>
   );
 }

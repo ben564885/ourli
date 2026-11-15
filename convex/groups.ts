@@ -3,6 +3,15 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { addAvatar, randomCode } from "./lib";
 
+const LOOKS = [
+  { color: "#7DB7F0", icon: "sparkles" },
+  { color: "#FF9EB5", icon: "heart" },
+  { color: "#8FE0B0", icon: "leaf" },
+  { color: "#FFD27A", icon: "sunny" },
+  { color: "#C6A8FF", icon: "moon" },
+  { color: "#FF9B7A", icon: "flame" },
+];
+
 export const create = mutation({
   args: { name: v.string(), userId: v.id("users") },
   handler: async (ctx, { name, userId }) => {
@@ -10,7 +19,8 @@ export const create = mutation({
     while (await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", inviteCode)).unique()) {
       inviteCode = randomCode();
     }
-    const groupId = await ctx.db.insert("groups", { name: name.trim().slice(0, 40), inviteCode, createdBy: userId });
+    const look = LOOKS[Math.floor(Math.random() * LOOKS.length)];
+    const groupId = await ctx.db.insert("groups", { name: name.trim().slice(0, 40), inviteCode, createdBy: userId, ...look });
     await ctx.db.insert("groupMembers", { groupId, userId });
     return groupId;
   },

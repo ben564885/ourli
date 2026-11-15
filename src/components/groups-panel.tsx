@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
-import { Body, Button, Card, H2, Pill } from "./ui";
+import { Body, Button, Card, H2, Pill, GroupBadge } from "./ui";
 import { C, F, themed } from "@/lib/theme";
 
 export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"users">; title?: string }) {
@@ -19,11 +19,14 @@ export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"use
       {groups?.length === 0 && <Body muted>No groups yet. Make one for your friends, or join with a code.</Body>}
       {groups?.map((g) => (
         <Card key={g._id} onPress={() => router.push(("/group/" + g._id) as any)}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-            <Text style={{ color: C.text, fontFamily: F.sansMedium, fontSize: 20 }}>{g.name}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+            <GroupBadge color={g.color} icon={g.icon} size={48} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={{ color: C.text, fontFamily: F.sansMedium, fontSize: 20 }}>{g.name}</Text>
+              <Text style={{ color: C.muted, fontFamily: F.serif, fontSize: 16 }}>{g.memberCount} {g.memberCount === 1 ? "member" : "members"} · code {g.inviteCode}</Text>
+            </View>
             {g.activeDay && <Pill text="Day live" color={C.accentSoft} />}
           </View>
-          <Text style={{ color: C.muted, fontFamily: F.serif, fontSize: 16 }}>{g.memberCount} {g.memberCount === 1 ? "member" : "members"} · code {g.inviteCode}</Text>
         </Card>
       ))}
       <Card>

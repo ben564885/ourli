@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Linking, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import * as ExpoLinking from "expo-linking";
@@ -104,13 +105,14 @@ export default function CreatorJoin() {
     }
   }
 
-  const cta = (title: string, onPress: () => void, disabled?: boolean, testID?: string) => (
+  const cta = (title: string, onPress: () => void, disabled?: boolean, testID?: string, crown?: boolean) => (
     <Pressable
       testID={testID}
       onPress={onPress}
       disabled={disabled || busy}
-      style={{ height: 64, borderRadius: 999, backgroundColor: C.accent, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.4 : 1 }}>
-      <Text style={{ fontFamily: F.sansMedium, fontSize: 21, color: "#fff" }}>{busy ? "One sec…" : title}</Text>
+      style={{ height: 68, borderRadius: 999, backgroundColor: C.accent, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 12, opacity: disabled ? 0.4 : 1, shadowColor: "#000", shadowOpacity: crown ? 0.25 : 0, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}>
+      {crown && !busy && <MaterialCommunityIcons name="crown" size={24} color={C.onAccent} />}
+      <Text style={{ fontFamily: F.sansMedium, fontSize: 21, color: C.onAccent }}>{busy ? "One sec…" : title}</Text>
     </Pressable>
   );
 
@@ -192,11 +194,15 @@ export default function CreatorJoin() {
                     style={{ backgroundColor: C.card, color: C.text, borderRadius: 999, height: 56, paddingHorizontal: 22, fontSize: 17, fontFamily: F.sans }}
                   />
                 )}
-                {cta("Join with Whop", joinWithWhop, !userId && !name.trim(), "join-whop")}
-                <Text style={{ fontFamily: F.sans, fontSize: 15, lineHeight: 22, textAlign: "center", color: C.muted }}>
-                  <Text style={{ color: C.muted, fontFamily: F.sansMedium }}>Free pass · $0. </Text>
-                  We check your Whop account has access, then you're in.
-                </Text>
+                {cta("Unlock the full day", joinWithWhop, !userId && !name.trim(), "join-whop", true)}
+                <View style={{ gap: 8, alignSelf: "center" }}>
+                  {["Every hour, side by side with " + creatorName, "A recap of your day together", "Free pass · $0, checked through Whop"].map((t) => (
+                    <View key={t} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                      <Ionicons name="checkmark-circle" size={20} color={C.text} />
+                      <Text style={{ fontFamily: F.sans, fontSize: 15, color: C.muted }}>{t}</Text>
+                    </View>
+                  ))}
+                </View>
               </>
             )}
 

@@ -13,7 +13,8 @@ import { uploadPhoto } from "@/lib/upload";
 import { useNow } from "@/lib/use-now";
 import { dayClock, formatCountdown } from "@/lib/time";
 import { C } from "@/lib/theme";
-import { Button, Photo } from "@/components/ui";
+import { Button, GroupBadge, Photo } from "@/components/ui";
+import { Ionicons } from "@expo/vector-icons";
 
 const useLiveCamera = Platform.OS !== "web" && Device.isDevice;
 
@@ -23,6 +24,9 @@ export default function Capture() {
   const day = useQuery(api.days.get, { dayId: dayId as Id<"days"> });
   const genUrl = useMutation(api.captures.generateUploadUrl);
   const create = useMutation(api.captures.create);
+  const groups = useQuery(api.groups.mine, userId ? { userId } : "skip");
+  const [sheet, setSheet] = useState(false);
+  const [chosen, setChosen] = useState<string[] | null>(null);
   const [perm, requestPerm] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>("back");
   const [preview, setPreview] = useState<string | null>(null);
@@ -39,16 +43,39 @@ export default function Capture() {
     if (!res.canceled) setPreview(res.assets[0].uri);
   }
 
-  async function post() {
-    if (!preview || !userId) return;
+  const options = day?.type === "creator" ? [] : (groups ?? []).filter((g) => g.activeDay);
+  const current = day?.groupId ? String(day.groupId) : null;
+  const picked = chosen ?? (current ? [current] : []);
+
+  async function send(targets: { dayId: Id<"days">; hourIndex: number }[]) {
+    if (!preview || !userId || targets.length === 0) return;
     setBusy(true);
     try {
       const ids = await uploadPhoto(preview, () => genUrl());
-      await create({ dayId: dayId as Id<"days">, userId, hourIndex: idx, ...ids });
+      for (const t of targets) await create({ ...t, userId, ...ids });
       router.back();
     } finally {
       setBusy(false);
+      setSheet(false);
     }
+  }
+
+  function post() {
+    if (options.length <= 1) return send([{ dayId: dayId as Id<"days">, hourIndex: idx }]);
+    setSheet(true);
+  }
+
+  function sendToPicked() {
+    const targets: { dayId: Id<"days">; hourIndex: number }[] = [];
+    for (const g of options) {
+      if (!picked.includes(String(g._id)) || !g.activeDay) continue;
+      if (g.activeDay._id === dayId) targets.push({ dayId: g.activeDay._id, hourIndex: idx });
+      else {
+        const clock = dayClock(g.activeDay, Date.now());
+        if (!clock.notStarted && !clock.ended) targets.push({ dayId: g.activeDay._id, hourIndex: clock.current });
+      }
+    }
+    return send(targets);
   }
 
   return (
@@ -84,7 +111,7 @@ export default function Capture() {
           {preview ? (
             <>
               <Button title="Retake" variant="secondary" onPress={() => setPreview(null)} style={{ width: 130 }} />
-              <Button testID="post-photo" title="Post" loading={busy} onPress={post} style={{ width: 130 }} />
+              <Button testID="post-photo" title={options.length > 1 ? "Send to…" : "Post"} loading={busy} onPress={post} style={{ width: 130 }} />
             </>
           ) : useLiveCamera && perm?.granted ? (
             <>
@@ -104,6 +131,47 @@ export default function Capture() {
           ) : null}
         </View>
       </SafeAreaView>
+      {sheet && (
+        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, top: 0, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.55)" }}>
+          <Pressable style={{ flex: 1 }} onPress={() => setSheet(false)} />
+          <SafeAreaView edges={["bottom"]} style={{ backgroundColor: "#16171A", borderTopLeftRadius: 32, borderTopRightRadius: 32 }}>
+            <View style={{ padding: 22, gap: 12 }}>
+              <Text style={{ color: "#fff", fontSize: 22, fontWeight: "700" }}>Send to</Text>
+              <Pressable
+                testID="send-all"
+                onPress={() => setChosen(picked.length === options.length ? [] : options.map((g) => String(g._id)))}
+                style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8 }}>
+                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" }}>
+                  <Ionicons name="people" size={20} color="#111" />
+                </View>
+                <Text style={{ flex: 1, color: "#fff", fontSize: 17, fontWeight: "600" }}>All groups</Text>
+                <Ionicons name={picked.length === options.length ? "checkmark-circle" : "ellipse-outline"} size={26} color="#fff" />
+              </Pressable>
+              {options.map((g) => {
+                const on = picked.includes(String(g._id));
+                return (
+                  <Pressable
+                    key={g._id}
+                    testID={"send-" + g.name}
+                    onPress={() => setChosen(on ? picked.filter((x) => x !== String(g._id)) : [...picked, String(g._id)])}
+                    style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8 }}>
+                    <GroupBadge color={g.color} icon={g.icon} size={40} />
+                    <Text style={{ flex: 1, color: "#fff", fontSize: 17, fontWeight: "600" }}>{g.name}</Text>
+                    <Ionicons name={on ? "checkmark-circle" : "ellipse-outline"} size={26} color={on ? "#fff" : "#6B6D73"} />
+                  </Pressable>
+                );
+              })}
+              <Pressable
+                testID="send-confirm"
+                disabled={picked.length === 0 || busy}
+                onPress={sendToPicked}
+                style={{ height: 56, borderRadius: 999, backgroundColor: "#fff", alignItems: "center", justifyContent: "center", marginTop: 6, opacity: picked.length === 0 ? 0.4 : 1 }}>
+                <Text style={{ color: "#111", fontSize: 17, fontWeight: "700" }}>{picked.length === options.length ? "Send to all" : "Send to " + picked.length + (picked.length === 1 ? " group" : " groups")}</Text>
+              </Pressable>
+            </View>
+          </SafeAreaView>
+        </View>
+      )}
       {busy && <ActivityIndicator style={{ position: "absolute", top: "50%", alignSelf: "center" }} color="#fff" size="large" />}
     </View>
   );

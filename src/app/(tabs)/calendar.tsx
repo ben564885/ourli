@@ -94,7 +94,7 @@ export default function Calendar() {
   const { userId } = useSession();
   const { width } = useWindowDimensions();
   const scroll = useRef<any>(null);
-  const pos = useRef({ month: -1, today: -1, done: false });
+  const pos = useRef({ month: -1, monthH: 0, viewH: 0, today: -1, done: false });
   const cardPad = 20;
   const cell = Math.floor((width - cardPad * 2) / 7);
   const now = new Date();
@@ -103,6 +103,11 @@ export default function Calendar() {
     const { month, today } = pos.current;
     if (month < 0 || today < 0) return;
     scroll.current?.scrollTo({ y: Math.max(0, month + today - 150), animated });
+  };
+  const goBottom = () => {
+    const { month, monthH, viewH } = pos.current;
+    if (month < 0 || !monthH || !viewH || pos.current.done) return;
+    scroll.current?.scrollTo({ y: Math.max(0, month + monthH - viewH + 124), animated: false });
     pos.current.done = true;
   };
   if (!userId) return null;
@@ -119,14 +124,15 @@ export default function Calendar() {
           <Text style={{ fontFamily: F.sansMedium, fontSize: 14, color: C.bg }}>Today</Text>
         </Pressable>
       </View>
-      <ScrollView ref={scroll} contentContainerStyle={{ paddingHorizontal: cardPad, paddingBottom: 130, paddingTop: 12 }}>
+      <ScrollView ref={scroll} onLayout={(e) => { pos.current.viewH = e.nativeEvent.layout.height; goBottom(); }} contentContainerStyle={{ paddingHorizontal: cardPad, paddingBottom: 130, paddingTop: 12 }}>
         {months.map((m, i) => (
           <View
             key={monthKey(m)}
             onLayout={(e) => {
               if (i !== 2) return;
               pos.current.month = e.nativeEvent.layout.y;
-              if (!pos.current.done) goToday();
+              pos.current.monthH = e.nativeEvent.layout.height;
+              goBottom();
             }}>
             <Month
               year={m.getFullYear()}
@@ -134,7 +140,7 @@ export default function Calendar() {
               cell={cell}
               userId={userId}
               groupId={groupId as Id<"groups"> | undefined}
-              onToday={i === 2 ? (y) => { pos.current.today = y; if (!pos.current.done) goToday(); } : undefined}
+              onToday={i === 2 ? (y) => { pos.current.today = y; } : undefined}
             />
           </View>
         ))}

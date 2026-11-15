@@ -207,6 +207,61 @@ export const clearCreatorAvatars = internalMutation({
 });
 
 const KEEP = ["Philip", "Ayush", "Daniel"];
+const EXTRA = [
+  { name: "Roommates", code: "ROOM2", color: "#FF9EB5", icon: "home", members: ["Ben", "Ayush", "Daniel"] },
+  { name: "College crew", code: "COLL3", color: "#8FE0B0", icon: "school", members: ["Ben", "Philip", "Ayush"] },
+];
+
+async function demoGroups(ctx: { db: any }) {
+  const out: any[] = [];
+  for (const code of [CODE, ...EXTRA.map((e) => e.code)]) {
+    const gr = await ctx.db.query("groups").withIndex("by_invite", (q: any) => q.eq("inviteCode", code)).unique();
+    if (gr) out.push(gr);
+  }
+  return out;
+}
+
+export const seedExtraGroups = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const main = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!main) return "no main group";
+    await ctx.db.patch(main._id, { color: "#7DB7F0", icon: "sparkles" });
+    const mainMembers = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", main._id)).collect();
+    const byName = new Map<string, Id<"users">>();
+    for (const m of mainMembers) {
+      const u = await ctx.db.get(m.userId);
+      if (u) byName.set(u.name, u._id);
+    }
+    let n = 0;
+    for (const e of EXTRA) {
+      if (await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", e.code)).unique()) continue;
+      const createdBy = byName.get("Ben") ?? [...byName.values()][0];
+      const groupId = await ctx.db.insert("groups", { name: e.name, inviteCode: e.code, demo: true, color: e.color, icon: e.icon, createdBy });
+      for (const name of e.members) {
+        const uid = byName.get(name);
+        if (uid) await ctx.db.insert("groupMembers", { groupId, userId: uid });
+      }
+      n++;
+    }
+    return "added " + n + " groups";
+  },
+});
+
+export const setCreatorAvatar = internalMutation({
+  args: { name: v.string(), storageId: v.id("_storage") },
+  handler: async (ctx, { name, storageId }) => {
+    let n = 0;
+    for (const day of await ctx.db.query("days").filter((q) => q.eq(q.field("type"), "creator")).collect()) {
+      const u = day.creatorId ? await ctx.db.get(day.creatorId) : null;
+      if (u?.name === name) {
+        await ctx.db.patch(u._id, { avatarId: storageId });
+        n++;
+      }
+    }
+    return n;
+  },
+});
 const COLORS = ["#7C83FD", "#FF8FAB", "#FFB86B", "#5EE6A8", "#6BC5FF", "#C38BFF", "#FFD166"];
 
 export const joinDemo = mutation({
@@ -214,15 +269,18 @@ export const joinDemo = mutation({
   handler: async (ctx, { name, avatarId }) => {
     const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
     if (!group) throw new Error("Demo group is not seeded");
-    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
-    for (const m of members) {
-      const u = await ctx.db.get(m.userId);
-      if (u && KEEP.includes(u.name)) continue;
-      for (const c of await ctx.db.query("captures").filter((q) => q.eq(q.field("userId"), m.userId)).collect()) await ctx.db.delete(c._id);
-      await ctx.db.delete(m._id);
+    const all = await demoGroups(ctx);
+    for (const gr of all) {
+      const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", gr._id)).collect();
+      for (const m of members) {
+        const u = await ctx.db.get(m.userId);
+        if (u && KEEP.includes(u.name)) continue;
+        for (const c of await ctx.db.query("captures").filter((q) => q.eq(q.field("userId"), m.userId)).collect()) await ctx.db.delete(c._id);
+        await ctx.db.delete(m._id);
+      }
     }
     const userId = await ctx.db.insert("users", { name: name.trim().slice(0, 32), color: COLORS[Math.floor(Math.random() * COLORS.length)], avatarId });
-    await ctx.db.insert("groupMembers", { groupId: group._id, userId });
+    for (const gr of all) await ctx.db.insert("groupMembers", { groupId: gr._id, userId });
     await ctx.scheduler.runAfter(0, internal.demo.backfillUser, { groupId: group._id, userId });
     return { userId, groupId: group._id };
   },
