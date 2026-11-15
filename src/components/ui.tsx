@@ -10,7 +10,7 @@ export function Screen({ children, scroll = true, style }: { children: ReactNode
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["top", "left", "right"]}>
       <Animated.View entering={FadeIn.duration(220)} style={{ flex: 1 }}>
       {scroll ? (
-        <ScrollView contentContainerStyle={[{ padding: 20, paddingBottom: 60, gap: 16 }, style]}>{children}</ScrollView>
+        <ScrollView contentContainerStyle={[{ padding: 20, paddingBottom: 130, gap: 16 }, style]}>{children}</ScrollView>
       ) : (
         <View style={[{ flex: 1, padding: 20, gap: 16 }, style]}>{children}</View>
       )}

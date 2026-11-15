@@ -117,7 +117,7 @@ export default function Calendar() {
           <Text style={{ fontFamily: F.sansMedium, fontSize: 14, color: "#000" }}>Today</Text>
         </Pressable>
       </View>
-      <ScrollView ref={scroll} contentContainerStyle={{ paddingHorizontal: cardPad, paddingBottom: 40, paddingTop: 12 }}>
+      <ScrollView ref={scroll} contentContainerStyle={{ paddingHorizontal: cardPad, paddingBottom: 130, paddingTop: 12 }}>
         {months.map((m, i) => (
           <View
             key={monthKey(m)}

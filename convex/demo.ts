@@ -205,3 +205,25 @@ export const clearCreatorAvatars = internalMutation({
     return n;
   },
 });
+
+const KEEP = ["Philip", "Ayush", "Daniel"];
+const COLORS = ["#7C83FD", "#FF8FAB", "#FFB86B", "#5EE6A8", "#6BC5FF", "#C38BFF", "#FFD166"];
+
+export const joinDemo = mutation({
+  args: { name: v.string(), avatarId: v.optional(v.id("_storage")) },
+  handler: async (ctx, { name, avatarId }) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) throw new Error("Demo group is not seeded");
+    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    for (const m of members) {
+      const u = await ctx.db.get(m.userId);
+      if (u && KEEP.includes(u.name)) continue;
+      for (const c of await ctx.db.query("captures").filter((q) => q.eq(q.field("userId"), m.userId)).collect()) await ctx.db.delete(c._id);
+      await ctx.db.delete(m._id);
+    }
+    const userId = await ctx.db.insert("users", { name: name.trim().slice(0, 32), color: COLORS[Math.floor(Math.random() * COLORS.length)], avatarId });
+    await ctx.db.insert("groupMembers", { groupId: group._id, userId });
+    await ctx.scheduler.runAfter(0, internal.demo.backfillUser, { groupId: group._id, userId });
+    return { userId, groupId: group._id };
+  },
+});

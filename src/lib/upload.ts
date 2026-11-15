@@ -15,3 +15,8 @@ export async function uploadPhoto(uri: string, getUrl: () => Promise<string>) {
   const [storageId, thumbId] = await Promise.all([put(await getUrl(), full.uri), put(await getUrl(), thumb.uri)]);
   return { storageId, thumbId };
 }
+
+export async function uploadAvatar(uri: string, getUrl: () => Promise<string>) {
+  const img = await manipulateAsync(uri, [{ resize: { width: 480 } }], { compress: 0.75, format: SaveFormat.JPEG });
+  return await put(await getUrl(), img.uri);
+}

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import Animated2, { FadeIn, FadeOut } from "react-native-reanimated";
+import * as ImagePicker from "expo-image-picker";
+import { Image } from "expo-image";
+import { uploadAvatar } from "@/lib/upload";
 import { Alert, Animated, Easing, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -50,32 +53,38 @@ export function Onboarding() {
   const { setUserId } = useSession();
   const create = useMutation(api.users.create);
   const join = useMutation(api.groups.join);
-  const loginBen = useMutation(api.demo.loginBen);
-  const [step, setStep] = useState<"intro" | "name" | "code">("intro");
+  const joinDemo = useMutation(api.demo.joinDemo);
+  const genUrl = useMutation(api.captures.generateUploadUrl);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [step, setStep] = useState<"intro" | "name" | "code" | "photo">("intro");
+  const [from, setFrom] = useState<"name" | "code">("name");
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
+  async function pick() {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], allowsEditing: true, aspect: [1, 1], quality: 0.8 });
+    if (!res.canceled) setPhoto(res.assets[0].uri);
+  }
+
   async function finish() {
     setBusy(true);
     try {
-      const demo = name.trim().toLowerCase() === "ben" || code.trim().toUpperCase() === "OURLI1";
-      if (demo) {
-        const res = await loginBen();
+      const avatarId = photo ? await uploadAvatar(photo, () => genUrl()) : undefined;
+      const typed = code.trim().toUpperCase();
+      if (!typed || typed === "OURLI1") {
+        const res = await joinDemo({ name, avatarId });
         await setUserId(res.userId);
-        if (step === "code") router.push(("/group/" + res.groupId) as any);
         return;
       }
-      const id = await create({ name });
-      if (step === "code" && code.trim()) {
-        try {
-          const groupId = await join({ inviteCode: code, userId: id });
-          await setUserId(id);
-          router.push(("/group/" + groupId) as any);
-          return;
-        } catch {
-          Alert.alert("Couldn't find that group", "You're signed up. Join from the home screen with the right code.");
-        }
+      const id = await create({ name, avatarId });
+      try {
+        const groupId = await join({ inviteCode: typed, userId: id });
+        await setUserId(id);
+        router.push(("/group/" + groupId) as any);
+        return;
+      } catch {
+        Alert.alert("Couldn't find that group", "You're signed up. Join from the Groups tab with the right code.");
       }
       await setUserId(id);
     } finally {
@@ -90,7 +99,7 @@ export function Onboarding() {
           <Text style={s.h1}>Let's share</Text>
           <Text style={s.h1Serif}>your day</Text>
           <Text style={s.h1}>hour by hour</Text>
-          <Text style={s.sub}>{step === "intro" ? "No filters. Just your hours, together." : step === "code" ? "Your name, then the code your friend sent." : "What should your friends call you?"}</Text>
+          <Text style={s.sub}>{step === "intro" ? "No filters. Just your hours, together." : step === "photo" ? "Add a photo so your friends know it's you." : step === "code" ? "Your name, then the code your friend sent." : "What should your friends call you?"}</Text>
         </View>
 
         <Animated2.View key={step} entering={FadeIn.duration(300)} exiting={FadeOut.duration(120)}>
@@ -99,6 +108,13 @@ export function Onboarding() {
             <Marquee chips={ROWS[0]} duration={26000} />
             <Marquee chips={ROWS[1]} duration={32000} reverse />
             <Marquee chips={ROWS[2]} duration={28000} />
+          </View>
+        ) : step === "photo" ? (
+          <View style={{ alignItems: "center", marginTop: 36, gap: 18 }}>
+            <Pressable testID="pick-avatar" onPress={pick} style={{ width: 168, height: 168, borderRadius: 84, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, backgroundColor: photo ? C.bg : C.sky, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+              {photo ? <Image source={{ uri: photo }} style={{ width: "100%", height: "100%" }} contentFit="cover" /> : <Text style={{ fontFamily: F.serifItalic, fontSize: 20, color: C.text }}>Add photo</Text>}
+            </Pressable>
+            <Pressable onPress={pick}><Text style={s.link}>{photo ? "Choose a different photo" : "Choose from library"}</Text></Pressable>
           </View>
         ) : (
           <View style={{ gap: 12, marginTop: 36, paddingHorizontal: 24 }}>
@@ -121,7 +137,21 @@ export function Onboarding() {
             </>
           ) : (
             <>
-              <Button testID="onboard-continue" title="Let's go" disabled={!name.trim() || (step === "code" && code.trim().length < 4)} loading={busy} onPress={finish} />
+              {step === "photo" ? (
+                <>
+                  <Button testID="onboard-finish" title={photo ? "Let's go" : "Skip for now"} loading={busy} onPress={finish} />
+                  <Pressable onPress={() => setStep(from)} style={{ height: 52, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={s.link}>Back</Text>
+                  </Pressable>
+                </>
+              ) : (
+                <>
+                  <Button testID="onboard-continue" title="Continue" disabled={!name.trim() || (step === "code" && code.trim().length < 4)} onPress={() => { setFrom(step as "name" | "code"); setStep("photo"); }} />
+                  <Pressable onPress={() => setStep("intro")} style={{ height: 52, alignItems: "center", justifyContent: "center" }}>
+                    <Text style={s.link}>Back</Text>
+                  </Pressable>
+                </>
+              )}
               <Pressable onPress={() => setStep("intro")} style={{ height: 52, alignItems: "center", justifyContent: "center" }}>
                 <Text style={s.link}>Back</Text>
               </Pressable>

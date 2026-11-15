@@ -1,4 +1,6 @@
-import { Pressable } from "react-native";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
+import { BlurView } from "expo-blur";
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -31,11 +33,24 @@ function PlusButton({ onPress }: { onPress?: (e: any) => void }) {
         spin.set(withTiming(spin.get() + 90, { duration: 260 }));
         onPress?.(e);
       }}
-      style={{ flex: 1, alignItems: "center", justifyContent: "flex-start" }}>
-      <Animated.View style={[{ width: 60, height: 60, borderRadius: 30, backgroundColor: C.accent, alignItems: "center", justifyContent: "center", marginTop: -18, shadowColor: "#000", shadowOpacity: 0.22, shadowRadius: 12, shadowOffset: { width: 0, height: 6 } }, style]}>
-        <Ionicons name="add" size={34} color="#fff" />
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Animated.View style={[{ width: 48, height: 48, borderRadius: 24, backgroundColor: C.accent, alignItems: "center", justifyContent: "center" }, style]}>
+        <Ionicons name="add" size={30} color="#fff" />
       </Animated.View>
     </Pressable>
+  );
+}
+
+function GlassPill() {
+  const glass = Platform.OS === "ios" && isLiquidGlassAvailable();
+  return (
+    <View style={[StyleSheet.absoluteFill, { borderRadius: 36, overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.14, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } }]}>
+      {glass ? (
+        <GlassView glassEffectStyle="regular" style={StyleSheet.absoluteFill} />
+      ) : (
+        <BlurView intensity={70} tint="systemChromeMaterialLight" style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(255,255,255,0.55)", borderRadius: 36, borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(0,0,0,0.12)" }]} />
+      )}
+    </View>
   );
 }
 
@@ -49,7 +64,11 @@ export default function TabsLayout() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: C.text,
         tabBarInactiveTintColor: C.faint,
-        tabBarStyle: userId ? { backgroundColor: C.bg, borderTopColor: "#ECECF0", height: 84, paddingTop: 10 } : { display: "none" },
+        tabBarStyle: userId
+          ? { position: "absolute", left: 24, right: 24, bottom: 28, height: 72, borderRadius: 36, borderTopWidth: 0, backgroundColor: "transparent", elevation: 0, paddingTop: 0, paddingBottom: 0 }
+          : { display: "none" },
+        tabBarBackground: () => <GlassPill />,
+        tabBarItemStyle: { height: 72, justifyContent: "center" },
       }}
       screenListeners={{ tabPress: () => Haptics.selectionAsync() }}>
       <Tabs.Screen name="index" options={{ title: "Home", tabBarIcon: icon("home", "home-outline") }} />
