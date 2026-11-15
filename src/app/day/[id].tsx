@@ -7,7 +7,7 @@ import { Id } from "@convex/_generated/dataModel";
 import { useSession } from "@/lib/session";
 import { useNow } from "@/lib/use-now";
 import { dayClock, formatCountdown, hourLabel } from "@/lib/time";
-import { C } from "@/lib/theme";
+import { C, F } from "@/lib/theme";
 import { Body, Button, H1, Loading, Pill, Screen } from "@/components/ui";
 import { HourReveal } from "@/components/hour-reveal";
 
@@ -50,8 +50,8 @@ export default function DayScreen() {
               key={i}
               disabled={future}
               onPress={() => setPicked(i)}
-              style={{ paddingHorizontal: 14, height: 36, borderRadius: 18, justifyContent: "center", backgroundColor: active ? C.accent : C.card, opacity: future ? 0.35 : 1 }}>
-              <Text style={{ color: active ? "#fff" : C.text, fontWeight: "700" }}>{hourLabel(day.startHour + i)}</Text>
+              style={{ paddingHorizontal: 16, height: 40, borderRadius: 999, justifyContent: "center", borderWidth: 1.5, borderStyle: "dashed", borderColor: active ? C.skyLine : C.line, backgroundColor: active ? C.sky : C.bg, opacity: future ? 0.35 : 1 }}>
+              <Text style={{ color: C.text, fontFamily: F.serif, fontSize: 16 }}>{hourLabel(day.startHour + i)}</Text>
             </Pressable>
           );
         })}

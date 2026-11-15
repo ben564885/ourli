@@ -7,7 +7,7 @@ import { Image } from "expo-image";
 import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useSession } from "@/lib/session";
-import { C } from "@/lib/theme";
+import { C, F } from "@/lib/theme";
 import { localDate, monthKey, pad } from "@/lib/time";
 
 const WEEKDAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
@@ -34,7 +34,7 @@ function Month({ year, month, cell, userId, groupId }: { year: number; month: nu
   const tile = cell - 8;
   return (
     <View style={{ marginBottom: 48 }}>
-      <Text style={{ color: C.text, fontSize: 40, fontWeight: "800", marginTop: 12, marginBottom: 28, letterSpacing: -0.5 }}>{MONTHS[month]}</Text>
+      <Text style={{ color: C.text, fontSize: 40, fontFamily: F.sansMedium, marginTop: 12, marginBottom: 28, letterSpacing: -1.4 }}>{MONTHS[month]}</Text>
       <View style={{ flexDirection: "row", marginBottom: 18 }}>
         {WEEKDAYS.map((w) => (
           <Text key={w} style={{ width: cell, textAlign: "center", color: C.faint, fontSize: 12, letterSpacing: 1.5 }}>{w}</Text>
@@ -88,40 +88,25 @@ export default function Calendar() {
   const { userId } = useSession();
   const { width } = useWindowDimensions();
   const scroll = useRef<any>(null);
-  const cardPad = 24;
-  const cardWidth = width - 24;
+  const cardPad = 20;
+  const cardWidth = width;
   const cell = Math.floor((cardWidth - cardPad * 2) / 7);
   const now = new Date();
   const months = [-2, -1, 0, 1].map((o) => new Date(now.getFullYear(), now.getMonth() + o, 1));
   if (!userId) return null;
   return (
-    <View style={{ flex: 1, backgroundColor: C.sky }}>
-      <SafeAreaView style={{ flex: 1, paddingHorizontal: 12, paddingTop: 8 }} edges={["top", "left", "right"]}>
-        <View style={{ flex: 1, backgroundColor: C.bg, borderTopLeftRadius: 44, borderTopRightRadius: 44, overflow: "hidden" }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: cardPad, paddingTop: 28, paddingBottom: 8 }}>
-            <Pressable accessibilityLabel="Menu" onPress={() => router.back()} style={{ gap: 6, padding: 4 }}>
-              <View style={{ width: 26, height: 2, backgroundColor: C.text, borderRadius: 1 }} />
-              <View style={{ width: 26, height: 2, backgroundColor: C.text, borderRadius: 1 }} />
-            </Pressable>
-            <Pressable accessibilityLabel="More" onPress={() => router.replace("/")} style={{ gap: 3, padding: 6 }}>
-              {[0, 1, 2].map((i) => (
-                <View key={i} style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: C.text }} />
-              ))}
-            </Pressable>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }} edges={["top", "left", "right"]}>
+      <ScrollView ref={scroll} contentContainerStyle={{ paddingHorizontal: cardPad, paddingBottom: 40, paddingTop: 12 }}>
+        {months.map((m, i) => (
+          <View
+            key={monthKey(m)}
+            onLayout={(e) => {
+              if (i === 2) scroll.current?.scrollTo({ y: e.nativeEvent.layout.y, animated: false });
+            }}>
+            <Month year={m.getFullYear()} month={m.getMonth()} cell={cell} userId={userId} groupId={groupId as Id<"groups"> | undefined} />
           </View>
-          <ScrollView ref={scroll} contentContainerStyle={{ paddingHorizontal: cardPad, paddingBottom: 80 }}>
-            {months.map((m, i) => (
-              <View
-                key={monthKey(m)}
-                onLayout={(e) => {
-                  if (i === 2) scroll.current?.scrollTo({ y: e.nativeEvent.layout.y, animated: false });
-                }}>
-                <Month year={m.getFullYear()} month={m.getMonth()} cell={cell} userId={userId} groupId={groupId as Id<"groups"> | undefined} />
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      </SafeAreaView>
-    </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }

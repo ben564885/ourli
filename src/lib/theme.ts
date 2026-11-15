@@ -11,7 +11,7 @@ export const C = {
   faint: "#A3A6AD",
   line: "#2B2B2B",
   danger: "#E5484D",
-  whop: "#FA4616",
+  whop: "#111111",
 };
 
 export const F = {

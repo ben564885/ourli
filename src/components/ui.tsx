@@ -30,9 +30,7 @@ export function Body({ children, style, muted }: { children: ReactNode; style?: 
 
 export function Logo({ size = 34 }: { size?: number }) {
   return (
-    <Text style={{ fontSize: size, fontFamily: F.sansBold, color: C.text, letterSpacing: -1 }}>
-      <Text style={{ fontFamily: F.serifItalic, fontWeight: "400" }}>our</Text>li
-    </Text>
+    <Text style={{ fontSize: size, fontFamily: F.sansBold, color: C.text, letterSpacing: -size * 0.04 }}>ourli</Text>
   );
 }
 
@@ -53,7 +51,7 @@ export function Button({
   style?: ViewStyle;
   testID?: string;
 }) {
-  const bg = variant === "primary" ? C.accent : variant === "whop" ? C.whop : variant === "secondary" ? C.cardHi : "transparent";
+  const bg = variant === "primary" || variant === "whop" ? C.accent : variant === "secondary" ? C.sky : "transparent";
   return (
     <Pressable
       testID={testID}
@@ -107,10 +105,30 @@ export function Pill({ text, color = C.accent }: { text: string; color?: string 
 }
 
 const s = StyleSheet.create({
-  h1: { color: C.text, fontSize: 36, fontFamily: F.sansBold, letterSpacing: -1 },
-  h2: { color: C.text, fontSize: 21, fontFamily: F.sansBold, letterSpacing: -0.3 },
+  h1: { color: C.text, fontSize: 40, lineHeight: 44, fontFamily: F.sansMedium, letterSpacing: -1.5 },
+  h2: { color: C.text, fontSize: 22, fontFamily: F.sansMedium, letterSpacing: -0.5 },
   body: { color: C.text, fontSize: 15, lineHeight: 21, fontFamily: F.sans },
   btn: { height: 56, borderRadius: 999, alignItems: "center", justifyContent: "center", paddingHorizontal: 22 },
-  btnText: { color: "#fff", fontSize: 16, fontFamily: F.sansBold },
-  card: { backgroundColor: C.card, borderRadius: 24, padding: 16, gap: 10 },
+  btnText: { color: "#fff", fontSize: 17, fontFamily: F.sansMedium },
+  card: { backgroundColor: C.bg, borderRadius: 28, padding: 18, gap: 12, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line },
 });
+
+export function Display({ lead, accent, tail, size = 40 }: { lead?: string; accent: string; tail?: string; size?: number }) {
+  return (
+    <Text style={{ color: C.text, fontSize: size, lineHeight: size * 1.08, fontFamily: F.sansMedium, letterSpacing: -size * 0.035 }}>
+      {lead ? lead + " " : ""}
+      <Text style={{ fontFamily: F.serifItalic, fontSize: size * 1.04 }}>{accent}</Text>
+      {tail ? " " + tail : ""}
+    </Text>
+  );
+}
+
+export function Chip({ label, selected, onPress }: { label: string; selected?: boolean; onPress?: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{ height: 46, paddingHorizontal: 20, borderRadius: 999, borderWidth: 1.5, borderStyle: "dashed", borderColor: selected ? C.skyLine : C.line, backgroundColor: selected ? C.sky : C.bg, justifyContent: "center" }}>
+      <Text style={{ fontFamily: F.serif, fontSize: 17, color: C.text }}>{label}</Text>
+    </Pressable>
+  );
+}

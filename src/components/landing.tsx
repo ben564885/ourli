@@ -200,7 +200,7 @@ function Creator({ wide }: { wide: boolean }) {
     <View id="creators" style={{ paddingVertical: 100, paddingHorizontal: 24, alignItems: "center", backgroundColor: "#fff" }}>
       <View style={{ width: "100%", maxWidth: 1100, borderRadius: 32, backgroundColor: "#f9bef9", padding: wide ? 56 : 28, flexDirection: wide ? "row" : "column", gap: 40, alignItems: "center" }}>
         <View style={{ flex: 1 }}>
-          <View style={[s.tag, { marginBottom: 18 }]}><View style={[s.dot, { backgroundColor: C.whop }]} /><Text style={s.tagText}>Creator Days · powered by Whop</Text></View>
+          <View style={[s.tag, { marginBottom: 18 }]}><View style={[s.dot, { backgroundColor: "#111" }]} /><Text style={s.tagText}>Creator Days · powered by Whop</Text></View>
           <Text style={[s.h2, { color: "#2a0f2a", fontSize: wide ? 48 : 34, lineHeight: wide ? 52 : 38 }]}>
             Spend the day with your <Text style={{ fontFamily: SERIF_I }}>favorite creator.</Text>
           </Text>
@@ -264,9 +264,7 @@ export function Landing() {
         </View>
       </ScrollView>
       <View style={s.header}>
-        <Text style={{ fontFamily: SANS_M, fontSize: 24, letterSpacing: -0.8, color: "#111" }}>
-          <Text style={{ fontFamily: SERIF_I }}>our</Text>li
-        </Text>
+        <Text style={{ fontFamily: "InstrumentSans_600SemiBold", fontSize: 24, letterSpacing: -1, color: "#111" }}>ourli</Text>
         {wide && (
           <View style={{ position: "absolute", left: 0, right: 0, flexDirection: "row", justifyContent: "center", gap: 40, pointerEvents: "none" }}>
             {["How it works", "Creator Days", "Stack"].map((l) => (

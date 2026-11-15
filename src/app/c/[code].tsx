@@ -109,7 +109,7 @@ export default function CreatorJoin() {
       testID={testID}
       onPress={onPress}
       disabled={disabled || busy}
-      style={{ height: 64, borderRadius: 999, backgroundColor: C.whop, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.4 : 1 }}>
+      style={{ height: 64, borderRadius: 999, backgroundColor: C.accent, alignItems: "center", justifyContent: "center", opacity: disabled ? 0.4 : 1 }}>
       <Text style={{ fontFamily: F.sansMedium, fontSize: 21, color: "#fff" }}>{busy ? "One sec…" : title}</Text>
     </Pressable>
   );
@@ -165,7 +165,7 @@ export default function CreatorJoin() {
             <Text style={{ fontFamily: F.sansMedium, fontSize: 24, textAlign: "center", color: C.text }}>{isCreator ? "Share your Day" : joined ? "You're in" : day.title}</Text>
 
             {status && status !== "ok" && MESSAGES[status] && (
-              <Text style={{ fontFamily: F.sans, fontSize: 15, textAlign: "center", color: C.whop }}>{MESSAGES[status]}</Text>
+              <Text style={{ fontFamily: F.sans, fontSize: 15, textAlign: "center", color: C.danger }}>{MESSAGES[status]}</Text>
             )}
 
             {isCreator ? (

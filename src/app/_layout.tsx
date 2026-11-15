@@ -20,6 +20,7 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <StatusBar style="dark" />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
+            <Stack.Screen name="(tabs)" />
             <Stack.Screen name="capture/[dayId]" options={{ presentation: "fullScreenModal", animation: "fade" }} />
           </Stack>
         </SafeAreaProvider>
