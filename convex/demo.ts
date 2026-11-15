@@ -179,3 +179,29 @@ export const setAvatars = internalMutation({
     return members.length;
   },
 });
+
+export const setAvatar = internalMutation({
+  args: { name: v.string(), storageId: v.optional(v.id("_storage")) },
+  handler: async (ctx, { name, storageId }) => {
+    const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
+    if (!group) return 0;
+    const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", group._id)).collect();
+    let n = 0;
+    for (const m of members) {
+      const u = await ctx.db.get(m.userId);
+      if (u?.name === name) { await ctx.db.patch(u._id, { avatarId: storageId }); n++; }
+    }
+    return n;
+  },
+});
+
+export const clearCreatorAvatars = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    let n = 0;
+    for (const day of await ctx.db.query("days").filter((q) => q.eq(q.field("type"), "creator")).collect()) {
+      if (day.creatorId) { await ctx.db.patch(day.creatorId, { avatarId: undefined }); n++; }
+    }
+    return n;
+  },
+});
