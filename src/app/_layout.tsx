@@ -19,11 +19,11 @@ const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, { unsa
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({ InstrumentSans_400Regular, InstrumentSans_500Medium, InstrumentSans_600SemiBold, Newsreader_400Regular, Newsreader_400Regular_Italic });
-  const [mode, setMode] = useState<Mode>("light");
+  const [mode, setMode] = useState<Mode>("dark");
   const [themeReady, setThemeReady] = useState(false);
   useEffect(() => {
     const apply = (v: string | null) => {
-      const m: Mode = v === "dark" ? "dark" : "light";
+      const m: Mode = v === "light" ? "light" : "dark";
       setTheme(m);
       setMode(m);
       setThemeReady(true);
@@ -32,7 +32,7 @@ export default function RootLayout() {
     SecureStore.getItemAsync(THEME_KEY).then(apply, () => apply(null));
   }, []);
   const [fade] = useState(() => new Animated.Value(0));
-  const [veil, setVeil] = useState<Mode>("light");
+  const [veil, setVeil] = useState<Mode>("dark");
   const [switching, setSwitching] = useState(false);
   const toggle = useCallback(() => {
     if (switching) return;
