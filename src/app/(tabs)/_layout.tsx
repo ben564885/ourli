@@ -1,5 +1,4 @@
 import { Platform, Pressable, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
@@ -42,22 +41,22 @@ function PlusButton({ onPress }: { onPress?: (e: any) => void }) {
   );
 }
 
-type BottomTabBarProps = { state: any; descriptors: any; navigation: any };
+type BottomTabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs>["tabBar"]>>[0];
 
-function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const { bottom } = useSafeAreaInsets();
+function GlassTabBar({ state, descriptors, emitter, navigateToTab, insets }: BottomTabBarProps) {
+  const { bottom } = insets;
   const glass = Platform.OS === "ios" && isLiquidGlassAvailable();
   const Wrap: any = glass ? GlassView : BlurView;
   const wrapProps = glass ? { glassEffectStyle: "regular" } : { intensity: 70, tint: "systemChromeMaterialLight" };
   return (
     <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: Math.max(bottom, 12) + 4, alignItems: "center" }}>
       <Wrap {...wrapProps} style={{ width: "86%", maxWidth: 380, height: 64, borderRadius: 32, overflow: "hidden", flexDirection: "row", alignItems: "center", paddingHorizontal: 8, backgroundColor: glass ? undefined : "rgba(255,255,255,0.6)" }}>
-        {state.routes.map((route: any, i: number) => {
+        {state.routes.map((route, i) => {
           const { options } = descriptors[route.key];
           const focused = state.index === i;
           const press = () => {
-            const e = navigation.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
-            if (!focused && !e.defaultPrevented) navigation.navigate(route.name as never);
+            const e = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
+            if (!focused && !e.defaultPrevented) navigateToTab(route.key);
           };
           if (route.name === "create") return <PlusButton key={route.key} onPress={press} />;
           return (
