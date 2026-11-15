@@ -1,7 +1,7 @@
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { Stack, router } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Platform } from "react-native";
+import { Animated, Easing, Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import * as Notifications from "expo-notifications";
 import { useFonts } from "expo-font";
@@ -10,7 +10,7 @@ import { Newsreader_400Regular, Newsreader_400Regular_Italic } from "@expo-googl
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SessionProvider } from "@/lib/session";
-import { C, Mode, setTheme, ThemeContext } from "@/lib/theme";
+import { C, Mode, modeBg, setTheme, ThemeContext } from "@/lib/theme";
 import "@/lib/notifications";
 
 const THEME_KEY = "ourli_theme";
@@ -31,13 +31,24 @@ export default function RootLayout() {
     if (Platform.OS === "web") return apply(globalThis.localStorage?.getItem(THEME_KEY) ?? null);
     SecureStore.getItemAsync(THEME_KEY).then(apply, () => apply(null));
   }, []);
+  const [fade] = useState(() => new Animated.Value(0));
+  const [veil, setVeil] = useState<Mode>("light");
+  const [switching, setSwitching] = useState(false);
   const toggle = useCallback(() => {
+    if (switching) return;
     const next: Mode = mode === "dark" ? "light" : "dark";
-    setTheme(next);
-    setMode(next);
-    if (Platform.OS === "web") globalThis.localStorage?.setItem(THEME_KEY, next);
-    else SecureStore.setItemAsync(THEME_KEY, next).catch(() => {});
-  }, [mode]);
+    setSwitching(true);
+    setVeil(next);
+    Animated.timing(fade, { toValue: 1, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true }).start(() => {
+      setTheme(next);
+      setMode(next);
+      if (Platform.OS === "web") globalThis.localStorage?.setItem(THEME_KEY, next);
+      else SecureStore.setItemAsync(THEME_KEY, next).catch(() => {});
+      setTimeout(() => {
+        Animated.timing(fade, { toValue: 0, duration: 320, easing: Easing.inOut(Easing.quad), useNativeDriver: true }).start(() => setSwitching(false));
+      }, 80);
+    });
+  }, [mode, switching, fade]);
   const theme = useMemo(() => ({ mode, toggle }), [mode, toggle]);
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((res) => {
@@ -61,6 +72,7 @@ export default function RootLayout() {
             <Stack.Screen name="capture/[dayId]" options={{ presentation: "fullScreenModal", animation: "slide_from_bottom" }} />
           </Stack>
         </SafeAreaProvider>
+        <Animated.View pointerEvents={switching ? "auto" : "none"} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: modeBg[veil], opacity: fade }} />
         </ThemeContext.Provider>
       </SessionProvider>
     </ConvexProvider>

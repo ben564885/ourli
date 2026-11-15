@@ -40,6 +40,8 @@ const DARK: typeof LIGHT = {
 
 export const C = { ...LIGHT };
 
+export const modeBg: Record<Mode, string> = { light: LIGHT.bg, dark: DARK.bg };
+
 let version = 0;
 
 export function setTheme(mode: Mode) {
