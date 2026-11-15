@@ -107,7 +107,7 @@ export default function Calendar() {
   const goBottom = () => {
     const { month, today, viewH } = pos.current;
     if (month < 0 || today < 0 || !viewH || pos.current.done) return;
-    scroll.current?.scrollTo({ y: Math.max(0, month + today + cell + 12 - viewH + 132), animated: false });
+    scroll.current?.scrollTo({ y: Math.max(0, month + today + (cell + 12) / 2 - viewH * 0.634), animated: false });
     pos.current.done = true;
   };
   if (!userId) return null;

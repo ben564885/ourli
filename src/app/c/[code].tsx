@@ -21,6 +21,7 @@ const PASS_URL = "https://whop.com/checkout/plan_CP6L8nLZEpYib";
 const MESSAGES: Record<string, string> = {
   no_access: "That Whop account doesn't have the pass yet. Grab it free, then try again.",
   error: "Whop sign-in hit a snag. Try again.",
+  claiming: "Claim your free pass on Whop. When you close that page you'll come back here and get in automatically.",
   cancelled: "Whop sign-in was cancelled.",
   not_configured: "Whop isn't connected on the backend yet. Use the demo join below.",
 };
@@ -87,7 +88,7 @@ export default function CreatorJoin() {
     return id;
   }
 
-  async function joinWithWhop() {
+  async function joinWithWhop(retry = false): Promise<void> {
     setBusy(true);
     try {
       const uid = await ensureUser();
@@ -98,7 +99,15 @@ export default function CreatorJoin() {
         return;
       }
       const res = await WebBrowser.openAuthSessionAsync(url, returnTo);
-      if (res.type === "success") setStatus(new URL(res.url).searchParams.get("whop") ?? "error");
+      if (res.type !== "success") return;
+      const result = new URL(res.url).searchParams.get("whop") ?? "error";
+      if (result === "no_access" && !retry) {
+        setStatus("claiming");
+        await WebBrowser.openAuthSessionAsync(PASS_URL, returnTo);
+        setBusy(false);
+        return joinWithWhop(true);
+      }
+      setStatus(result);
     } finally {
       setBusy(false);
     }
@@ -193,7 +202,7 @@ export default function CreatorJoin() {
                     style={{ backgroundColor: C.card, color: C.text, borderRadius: 999, height: 56, paddingHorizontal: 22, fontSize: 17, fontFamily: F.sans }}
                   />
                 )}
-                {cta("Unlock the full day", joinWithWhop, !userId && !name.trim(), "join-whop", true)}
+                {cta("Unlock the full day", () => joinWithWhop(), !userId && !name.trim(), "join-whop", true)}
                 {status === "no_access" && (
                   <Pressable testID="claim-pass" onPress={() => Linking.openURL(PASS_URL)} style={{ height: 56, borderRadius: 999, borderWidth: 1.5, borderColor: C.text, alignItems: "center", justifyContent: "center" }}>
                     <Text style={{ fontFamily: F.sansMedium, fontSize: 17, color: C.text }}>1. Claim the free pass, then tap Unlock again</Text>

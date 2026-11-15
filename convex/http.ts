@@ -88,6 +88,7 @@ http.route({
       });
       if (!accessRes.ok) throw new Error("access " + accessRes.status + " " + (await accessRes.text()));
       const access = await accessRes.json();
+      console.log("whop access check", me.id, me.username, productId, JSON.stringify(access));
       if (!access.has_access) return redirect(row.returnTo, { whop: "no_access", name: me.username ?? "" });
       await ctx.runMutation(internal.creator.addVerifiedFan, { dayId: row.dayId, userId: row.userId, whopUserId: me.id });
       return redirect(row.returnTo, { whop: "ok", name: me.username ?? me.name ?? "" });
