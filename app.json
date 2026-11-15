@@ -1,14 +1,16 @@
 {
   "expo": {
-    "name": "consumer-mobile-hack",
-    "slug": "consumer-mobile-hack",
+    "name": "ourli",
+    "slug": "ourli",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "consumermobilehack",
-    "userInterfaceStyle": "automatic",
+    "scheme": "ourli",
+    "userInterfaceStyle": "dark",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.ourli.app",
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
@@ -17,22 +19,38 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ourli.app"
     },
     "web": {
-      "output": "server",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
+      "expo-sharing",
+      "expo-secure-store",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#15151C",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "ourli uses the camera to snap your photo every hour."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "ourli lets you pick a photo for this hour."
+        }
+      ],
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,

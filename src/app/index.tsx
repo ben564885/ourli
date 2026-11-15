@@ -1,98 +1,161 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from "react";
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { router } from "expo-router";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
+import { useSession } from "@/lib/session";
+import { Avatar, Body, Button, Card, H2, Loading, Logo, Pill, Screen } from "@/components/ui";
+import { C } from "@/lib/theme";
+import { dayClock, formatCountdown, hourLabel } from "@/lib/time";
+import { useNow } from "@/lib/use-now";
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+function Onboarding() {
+  const { setUserId } = useSession();
+  const create = useMutation(api.users.create);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <Screen scroll={false} style={{ justifyContent: "center", gap: 24 }}>
+      <Logo size={56} />
+      <Text style={{ color: C.muted, fontSize: 20, fontWeight: "600" }}>every hour, together</Text>
+      <Body muted>Start a Day with your friends. Every hour, everyone snaps a photo. Tonight, see how each of your days went, side by side.</Body>
+      <TextInput
+        testID="name-input"
+        placeholder="Your name"
+        placeholderTextColor={C.faint}
+        value={name}
+        onChangeText={setName}
+        style={styles.input}
+        autoFocus
+      />
+      <Button
+        testID="onboard-continue"
+        title="Let's go"
+        disabled={!name.trim()}
+        loading={busy}
+        onPress={async () => {
+          setBusy(true);
+          const id = await create({ name });
+          await setUserId(id);
+          setBusy(false);
+        }}
+      />
+    </Screen>
   );
 }
 
-export default function HomeScreen() {
+function ActiveBanner({ day }: { day: any }) {
+  const now = useNow();
+  const clock = dayClock(day, now);
+  const label = day.type === "creator" ? (day.title ?? "Creator Day") : day.groupName;
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+    <Card style={{ backgroundColor: C.accent }} onPress={() => router.push(("/day/" + day._id) as any)}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <Text style={{ color: "#fff", fontWeight: "800", fontSize: 18 }}>{label}</Text>
+        {day.type === "creator" && <Pill text="Creator Day" color={C.whop} />}
+      </View>
+      <Text style={{ color: "#fff", opacity: 0.9 }}>
+        {clock.notStarted
+          ? "Starts in " + formatCountdown(clock.msLeft)
+          : hourLabel(day.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + day.hourCount + " · next in " + formatCountdown(clock.msLeft)}
+      </Text>
+      <Text style={{ color: "#fff", fontWeight: "700" }}>Open Day →</Text>
+    </Card>
+  );
+}
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+export default function Home() {
+  const { userId, loading, setUserId } = useSession();
+  const user = useQuery(api.users.get, userId ? { userId } : "skip");
+  const groups = useQuery(api.groups.mine, userId ? { userId } : "skip");
+  const active = useQuery(api.days.activeForUser, userId ? { userId } : "skip");
+  const createGroup = useMutation(api.groups.create);
+  const joinGroup = useMutation(api.groups.join);
+  const [groupName, setGroupName] = useState("");
+  const [code, setCode] = useState("");
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+  if (loading) return <Loading />;
+  if (!userId || user === null) return <Onboarding />;
+  if (user === undefined) return <Loading />;
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+  return (
+    <Screen>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <Logo />
+        <Pressable onLongPress={() => setUserId(null)} onPress={() => router.push("/calendar")}>
+          <Avatar name={user.name} color={user.color} />
+        </Pressable>
+      </View>
+
+      {active?.map((d) => <ActiveBanner key={d._id} day={d} />)}
+
+      <H2>Your groups</H2>
+      {groups?.length === 0 && <Body muted>No groups yet. Make one for your friends, or join with a code.</Body>}
+      {groups?.map((g) => (
+        <Card key={g._id} onPress={() => router.push(("/group/" + g._id) as any)}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={{ color: C.text, fontSize: 18, fontWeight: "700" }}>{g.name}</Text>
+            {g.activeDay && <Pill text="Day live" />}
+          </View>
+          <Body muted>{g.memberCount} {g.memberCount === 1 ? "member" : "members"} · code {g.inviteCode}</Body>
+        </Card>
+      ))}
+
+      <Card>
+        <TextInput
+          testID="group-name-input"
+          placeholder="New group name"
+          placeholderTextColor={C.faint}
+          value={groupName}
+          onChangeText={setGroupName}
+          style={styles.input}
+        />
+        <Button
+          testID="create-group"
+          title="Create group"
+          disabled={!groupName.trim()}
+          onPress={async () => {
+            const id = await createGroup({ name: groupName, userId });
+            setGroupName("");
+            router.push(("/group/" + id) as any);
+          }}
+        />
+      </Card>
+      <Card>
+        <TextInput
+          testID="invite-code-input"
+          placeholder="Invite code"
+          autoCapitalize="characters"
+          placeholderTextColor={C.faint}
+          value={code}
+          onChangeText={setCode}
+          style={styles.input}
+        />
+        <Button
+          testID="join-group"
+          variant="secondary"
+          title="Join group"
+          disabled={code.trim().length < 4}
+          onPress={async () => {
+            try {
+              const id = await joinGroup({ inviteCode: code, userId });
+              setCode("");
+              router.push(("/group/" + id) as any);
+            } catch {
+              Alert.alert("Couldn't find that group", "Double-check the code and try again.");
+            }
+          }}
+        />
+      </Card>
+
+      <View style={{ flexDirection: "row", gap: 12 }}>
+        <Button title="My calendar" variant="secondary" style={{ flex: 1 }} onPress={() => router.push("/calendar")} />
+        <Button title="Creator Day" variant="whop" style={{ flex: 1 }} onPress={() => router.push("/creator/new")} />
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+  input: { backgroundColor: C.cardHi, color: C.text, borderRadius: 14, height: 50, paddingHorizontal: 16, fontSize: 16 },
 });
