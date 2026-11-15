@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, Switch, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { C } from "@/lib/theme";
 import { hourLabel, localDate } from "@/lib/time";
 import { Body, Button } from "./ui";
@@ -11,11 +12,11 @@ function Stepper({ label, value, onChange, min, max }: { label: string; value: n
     <View style={{ flex: 1, gap: 6 }}>
       <Text style={{ color: C.muted, fontSize: 12, fontWeight: "700", letterSpacing: 1 }}>{label}</Text>
       <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: C.bg, borderRadius: 999, height: 54, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line }}>
-        <Pressable accessibilityLabel={label + " earlier"} onPress={() => onChange(Math.max(min, value - 1))} style={{ paddingHorizontal: 18, height: 54, justifyContent: "center" }}>
+        <Pressable accessibilityLabel={label + " earlier"} onPress={() => { Haptics.selectionAsync(); onChange(Math.max(min, value - 1)); }} style={{ paddingHorizontal: 18, height: 54, justifyContent: "center" }}>
           <Text style={{ color: C.text, fontSize: 20 }}>−</Text>
         </Pressable>
         <Text style={{ flex: 1, textAlign: "center", color: C.text, fontSize: 16, fontWeight: "700" }}>{hourLabel(value)}</Text>
-        <Pressable accessibilityLabel={label + " later"} onPress={() => onChange(Math.min(max, value + 1))} style={{ paddingHorizontal: 18, height: 54, justifyContent: "center" }}>
+        <Pressable accessibilityLabel={label + " later"} onPress={() => { Haptics.selectionAsync(); onChange(Math.min(max, value + 1)); }} style={{ paddingHorizontal: 18, height: 54, justifyContent: "center" }}>
           <Text style={{ color: C.text, fontSize: 20 }}>+</Text>
         </Pressable>
       </View>
@@ -40,7 +41,7 @@ export function StartDayForm({ onStart, cta = "Start Day", variant = "primary" }
           <Body>Fast mode</Body>
           <Body muted style={{ fontSize: 13 }}>Each hour lasts 1 minute, for demos.</Body>
         </View>
-        <Switch testID="fast-mode" value={fast} onValueChange={setFast} trackColor={{ true: C.accent }} />
+        <Switch testID="fast-mode" value={fast} onValueChange={(v) => { Haptics.selectionAsync(); setFast(v); }} trackColor={{ true: C.accent }} />
       </View>
       <Button
         testID="start-day"
@@ -48,6 +49,7 @@ export function StartDayForm({ onStart, cta = "Start Day", variant = "primary" }
         title={cta + " · " + (endHour - startHour) + (endHour - startHour === 1 ? " hour" : " hours")}
         loading={busy}
         onPress={async () => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           setBusy(true);
           const d = new Date();
           let startAt: number;
