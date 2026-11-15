@@ -152,9 +152,6 @@ export function Onboarding() {
                   </Pressable>
                 </>
               )}
-              <Pressable onPress={() => setStep("intro")} style={{ height: 52, alignItems: "center", justifyContent: "center" }}>
-                <Text style={s.link}>Back</Text>
-              </Pressable>
             </>
           )}
         </View>
