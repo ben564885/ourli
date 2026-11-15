@@ -122,7 +122,7 @@ export default function CreatorJoin() {
         <ScrollView contentContainerStyle={{ alignItems: "center", paddingBottom: 0 }} showsVerticalScrollIndicator={false}>
           <View style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "center", paddingTop: 10, height: 64 }}>
             <Logo size={26} />
-            <Pressable accessibilityLabel="Close" onPress={() => router.replace("/")} style={{ position: "absolute", right: 20, top: 10, width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: "#D9D9E0", backgroundColor: "#F7F7FA", alignItems: "center", justifyContent: "center" }}>
+            <Pressable accessibilityLabel="Close" onPress={() => (router.canGoBack() ? router.back() : router.replace("/creators" as any))} style={{ position: "absolute", right: 20, top: 10, width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: "#D9D9E0", backgroundColor: "#F7F7FA", alignItems: "center", justifyContent: "center" }}>
               <Text style={{ fontSize: 22, color: C.text, marginTop: -2 }}>×</Text>
             </Pressable>
           </View>
