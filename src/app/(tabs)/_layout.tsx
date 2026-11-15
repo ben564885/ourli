@@ -58,7 +58,6 @@ export default function TabsLayout() {
         options={{ title: "Create", tabBarButton: (p) => <PlusButton onPress={p.onPress as any} /> }}
       />
       <Tabs.Screen name="calendar" options={{ title: "Calendar", tabBarIcon: icon("calendar", "calendar-outline") }} />
-      <Tabs.Screen name="groups" options={{ href: null }} />
     </Tabs>
   );
 }

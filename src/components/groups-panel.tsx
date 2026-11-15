@@ -3,25 +3,21 @@ import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import { router } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
-import { useSession } from "@/lib/session";
-import { Body, Button, Card, Display, Loading, Pill, Screen } from "@/components/ui";
+import { Id } from "@convex/_generated/dataModel";
+import { Body, Button, Card, H2, Pill } from "./ui";
 import { C, F } from "@/lib/theme";
 
-export default function Groups() {
-  const { userId } = useSession();
-  const groups = useQuery(api.groups.mine, userId ? { userId } : "skip");
+export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"users">; title?: string }) {
+  const groups = useQuery(api.groups.mine, { userId });
   const createGroup = useMutation(api.groups.create);
   const joinGroup = useMutation(api.groups.join);
   const [groupName, setGroupName] = useState("");
   const [code, setCode] = useState("");
-  if (!userId || groups === undefined) return <Loading />;
   return (
-    <Screen>
-      <View style={{ marginTop: 8 }}>
-        <Display lead="Your" accent="people" />
-      </View>
-      {groups.length === 0 && <Body muted>No groups yet. Make one for your friends, or join with a code.</Body>}
-      {groups.map((g) => (
+    <View style={{ gap: 14 }}>
+      <H2 style={{ marginTop: 14 }}>{title}</H2>
+      {groups?.length === 0 && <Body muted>No groups yet. Make one for your friends, or join with a code.</Body>}
+      {groups?.map((g) => (
         <Card key={g._id} onPress={() => router.push(("/group/" + g._id) as any)}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <Text style={{ color: C.text, fontFamily: F.sansMedium, fontSize: 20 }}>{g.name}</Text>
@@ -61,7 +57,7 @@ export default function Groups() {
           }}
         />
       </Card>
-    </Screen>
+    </View>
   );
 }
 

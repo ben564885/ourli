@@ -1,11 +1,11 @@
 import { Platform, Pressable, Text, View } from "react-native";
 import { Image } from "expo-image";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
 import { Avatar, Body, Card, Display, H2, Loading, Logo, Pill, Screen } from "@/components/ui";
+import { GroupsPanel } from "@/components/groups-panel";
 import { Onboarding } from "@/components/onboarding";
 import { Landing } from "@/components/landing";
 import { C, F } from "@/lib/theme";
@@ -50,14 +50,9 @@ function HomeScreen() {
     <Screen>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <Logo />
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-          <Pressable testID="open-groups" accessibilityLabel="Groups" onPress={() => router.push("/groups")} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderStyle: "dashed", borderColor: C.line, alignItems: "center", justifyContent: "center" }}>
-            <Ionicons name="people-outline" size={22} color={C.text} />
-          </Pressable>
-          <Pressable onLongPress={() => setUserId(null)}>
-            <Avatar name={user.name} color={user.color} />
-          </Pressable>
-        </View>
+        <Pressable onLongPress={() => setUserId(null)}>
+          <Avatar name={user.name} color={user.color} />
+        </Pressable>
       </View>
 
       <View style={{ marginTop: 18, marginBottom: 6 }}>
@@ -87,6 +82,7 @@ function HomeScreen() {
           ))}
         </View>
       )}
+      <GroupsPanel userId={userId} />
     </Screen>
   );
 }

@@ -6,6 +6,7 @@ import { api } from "@convex/_generated/api";
 import { Id } from "@convex/_generated/dataModel";
 import { useSession } from "@/lib/session";
 import { Body, Card, Chip, Display, Loading, Screen } from "@/components/ui";
+import { GroupsPanel } from "@/components/groups-panel";
 import { StartDayForm } from "@/components/start-day-form";
 import { scheduleDayPings } from "@/lib/notifications";
 import { C, F } from "@/lib/theme";
@@ -25,10 +26,7 @@ export default function Create() {
       </View>
 
       {groups.length === 0 ? (
-        <Card onPress={() => router.push("/groups")}>
-          <Text style={{ fontFamily: F.sansMedium, fontSize: 19, color: C.text }}>You need a group first</Text>
-          <Text style={{ fontFamily: F.serifItalic, fontSize: 17, color: C.muted }}>Make one or join with a code →</Text>
-        </Card>
+        <GroupsPanel userId={userId} title="Start with a group" />
       ) : (
         <>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
