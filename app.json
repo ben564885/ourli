@@ -68,7 +68,11 @@
         "asyncRoutes": {
           "web": true
         }
+      },
+      "eas": {
+        "projectId": "098022b1-ad2c-4e94-91d7-7b0281a1fa2c"
       }
-    }
+    },
+    "owner": "ben_nisevich"
   }
 }
