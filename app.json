@@ -8,7 +8,7 @@
     "scheme": "ourli",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "com.ourlihack.app",
       "supportsTablet": false,
       "infoPlist": {
