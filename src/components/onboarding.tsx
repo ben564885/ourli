@@ -147,8 +147,8 @@ export function Onboarding() {
               <View>
                 <TextInput testID="onboard-code-input" autoCapitalize="characters" value={code} onChangeText={setCode} style={s.input} />
                 {code.length === 0 && (
-                  <Text pointerEvents="none" style={{ position: "absolute", left: 22, top: 0, bottom: 0, textAlignVertical: "center", lineHeight: 56, fontFamily: F.sans, fontSize: 17, color: C.faint }}>
-                    Judges use <Text style={{ fontFamily: F.sansBold, color: C.muted }}>"OURLI1"</Text>
+                  <Text pointerEvents="none" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} style={{ position: "absolute", left: 22, right: 22, top: 0, bottom: 0, textAlignVertical: "center", lineHeight: 56, fontFamily: F.sans, fontSize: 17, color: C.faint }}>
+                    Invite code: Judges use <Text style={{ fontFamily: F.sansBold, color: C.muted }}>"OURLI1"</Text>
                   </Text>
                 )}
               </View>
