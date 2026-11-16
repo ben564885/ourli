@@ -72,14 +72,17 @@ function GroupStack({ groups }: { groups: any[] }) {
             <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
               <GroupBadge color={g.color} icon={g.icon} size={front ? 40 : 24} />
               <Text style={{ color: K.text, fontFamily: F.sansMedium, fontSize: front ? 20 : 15, flex: 1 }}>{front && groups.length > 1 ? "Snap to your groups" : g.name}</Text>
-              {front && <Pill text="Live" color={K.text} />}
+              {front && (
+                <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: "#FFFFFF", alignItems: "center", justifyContent: "center" }}>
+                  <Ionicons name="arrow-up" size={26} color="#000000" style={{ transform: [{ rotate: "45deg" }] }} />
+                </View>
+              )}
             </View>
             {front && (
               <>
                 <Text style={{ color: K.muted, fontFamily: F.serif, fontSize: 17, marginTop: 14 }}>
                   {clock.notStarted ? "Starts in " + formatCountdown(clock.msLeft) : hourLabel(lead.startHour + clock.current) + " · hour " + (clock.current + 1) + " of " + lead.hourCount + " · next in " + formatCountdown(clock.msLeft)}
                 </Text>
-                <Text style={{ color: K.text, fontFamily: F.serifItalic, fontSize: 19, marginTop: 8 }}>Take a photo, then pick who gets it →</Text>
               </>
             )}
           </View>
