@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useSession } from "@/lib/session";
-import { Avatar, GroupBadge, Loading, Pill } from "@/components/ui";
+import { Avatar, GroupBadge, Loading } from "@/components/ui";
 import { Onboarding } from "@/components/onboarding";
 import { Landing } from "@/components/landing";
 import { Ionicons } from "@expo/vector-icons";
