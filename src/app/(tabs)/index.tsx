@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { LayoutAnimation, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -89,6 +89,75 @@ function GroupStack({ groups }: { groups: any[] }) {
   );
 }
 
+function GroupViewStack({ groups }: { groups: any[] }) {
+  const now = useNow();
+  const [open, setOpen] = useState(false);
+  const n = Math.min(groups.length, 4);
+  const peek = 30;
+  const toggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.create(260, "easeInEaseOut", "opacity"));
+    setOpen((o) => !o);
+  };
+  if (open) {
+    return (
+      <View style={{ gap: 10 }}>
+        {groups.map((g) => {
+          const clock = dayClock(g.activeDay, now);
+          return (
+            <Pressable
+              key={g._id}
+              testID={"view-" + g.name}
+              onPress={() => router.push(("/day/" + g.activeDay._id) as any)}
+              style={{ flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: K.card, borderRadius: 26, borderWidth: 1.5, borderColor: K.line, padding: 14 }}>
+              <GroupBadge color={g.color} icon={g.icon} size={44} />
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: K.text, fontFamily: F.sansMedium, fontSize: 18 }}>{g.name}</Text>
+                <Text style={{ color: K.muted, fontFamily: F.serif, fontSize: 15 }}>{hourLabel(g.activeDay.startHour + clock.current)} · hour {clock.current + 1} of {g.activeDay.hourCount}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={22} color={K.text} />
+            </Pressable>
+          );
+        })}
+        <Pressable onPress={toggle} style={{ alignSelf: "center", paddingVertical: 4 }}>
+          <Text style={{ color: K.muted, fontFamily: F.serifItalic, fontSize: 15 }}>Collapse</Text>
+        </Pressable>
+      </View>
+    );
+  }
+  return (
+    <Pressable testID="group-stack" onPress={toggle} style={{ height: 96 + (n - 1) * peek }}>
+      {groups.slice(0, n).map((g, i) => (
+        <View
+          key={g._id}
+          style={{
+            position: "absolute",
+            left: i * 12,
+            right: i * 12,
+            top: (n - 1 - i) * peek,
+            height: 96,
+            borderRadius: 28,
+            backgroundColor: i === 0 ? K.card : K.card,
+            borderWidth: 1.5,
+            borderColor: K.line,
+            padding: 16,
+            zIndex: n - i,
+            shadowColor: "#000",
+            shadowOpacity: 0.25,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: 4 },
+          }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <GroupBadge color={g.color} icon={g.icon} size={i === 0 ? 36 : 24} />
+            <Text style={{ color: K.text, fontFamily: F.sansMedium, fontSize: i === 0 ? 19 : 15, flex: 1 }}>{i === 0 ? "Your groups" : g.name}</Text>
+            {i === 0 && <Ionicons name="chevron-down" size={20} color={K.muted} />}
+          </View>
+          {i === 0 && <Text style={{ color: K.muted, fontFamily: F.serifItalic, fontSize: 16, marginTop: 10 }}>Sent · tap to open a group</Text>}
+        </View>
+      ))}
+    </Pressable>
+  );
+}
+
 function HomeScreen() {
   const { userId, loading, setUserId } = useSession();
   const [menu, setMenu] = useState(false);
@@ -135,7 +204,8 @@ function HomeScreen() {
         <Text style={{ fontFamily: F.sansMedium, fontSize: 15, color: K.text, marginTop: 10 }}>No filters. Just your hours, together.</Text>
       </View>
 
-      {liveGroups.length > 0 && <GroupStack groups={liveGroups} />}
+      {liveGroups.some((g) => !g.posted) && <GroupStack groups={liveGroups.filter((g) => !g.posted)} />}
+      {liveGroups.length > 0 && liveGroups.every((g) => g.posted) && <GroupViewStack groups={liveGroups} />}
       {active?.filter((d) => d.type === "creator").map((d) => <ActiveBanner key={d._id} day={d} />)}
       {active?.length === 0 && liveGroups.length === 0 && (
         <DCard onPress={() => router.push("/create")}>

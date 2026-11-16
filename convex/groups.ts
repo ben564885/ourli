@@ -60,7 +60,15 @@ export const mine = query({
           .withIndex("by_group", (q) => q.eq("groupId", group._id))
           .filter((q) => q.eq(q.field("status"), "active"))
           .first();
-        return { ...group, memberCount: members.length, activeDay: active };
+        let posted = false;
+        if (active) {
+          const hour = Math.min(Math.max(Math.floor((Date.now() - active.startAt) / active.slotMs), 0), active.hourCount - 1);
+          posted = !!(await ctx.db
+            .query("captures")
+            .withIndex("by_day_user_hour", (q) => q.eq("dayId", active._id).eq("userId", userId).eq("hourIndex", hour))
+            .first());
+        }
+        return { ...group, memberCount: members.length, activeDay: active, posted };
       }),
     );
     return groups.filter((g) => g !== null);

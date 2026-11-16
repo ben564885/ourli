@@ -23,7 +23,7 @@ export function GroupsPanel({ userId, title = "Your groups" }: { userId: Id<"use
       <H2 style={{ marginTop: 14 }}>{title}</H2>
       {groups?.length === 0 && <Body muted>No groups yet. Make one for your friends, or join with a code.</Body>}
       {groups?.map((g) => (
-        <Card key={g._id} onPress={() => router.push(("/group/" + g._id) as any)}>
+        <Card key={g._id} onPress={() => router.push((g.activeDay ? "/day/" + g.activeDay._id : "/group/" + g._id) as any)}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
             <GroupBadge color={g.color} icon={g.icon} size={48} />
             <View style={{ flex: 1, gap: 2 }}>
