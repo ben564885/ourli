@@ -1,0 +1,44 @@
+project:
+    id: a1aa4e75-2e2d-443d-ba18-191763fc17c0
+session:
+    idle_timeout_seconds: 1800
+build:
+    framework: expo
+    profiles:
+        development:
+            ios:
+                setup_commands:
+                    - npm install
+                    - if [ ! -d ios ]; then npx expo prebuild --platform ios --no-install; fi
+                build_commands:
+                    - cd ios && if [ ! -d Pods ]; then pod install; fi && WS=$(ls -d *.xcworkspace | head -n 1) && xcodebuild -workspace "$WS" -scheme "${WS%.xcworkspace}" -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath build
+                output_path: ios/build/Build/Products/Debug-iphonesimulator/*.app
+            android:
+                setup_commands:
+                    - npm install
+                    - if [ ! -d android ]; then npx expo prebuild --platform android --no-install; fi
+                build_commands:
+                    - cd android && ./gradlew assembleDebug -PreactNativeArchitectures=x86_64
+                output_path: android/app/build/outputs/apk/debug/app-debug.apk
+        preview:
+            ios:
+                app_id: 53ecf1b8-6328-45d3-9039-70590dea1f92
+                env:
+                    EXPO_PUBLIC_WEB_URL: https://ourli.ayushojha.com
+                    EXPO_PUBLIC_CONVEX_URL: https://zany-cuttlefish-217.convex.cloud
+                    EXPO_PUBLIC_CONVEX_SITE_URL: https://zany-cuttlefish-217.convex.site
+                setup_commands:
+                    - npm ci --no-audit --no-fund
+                    - if [ ! -d ios ]; then npx expo prebuild --platform ios --no-install; fi
+                build_commands:
+                    - cd ios && if [ ! -d Pods ]; then pod install; fi && WS=$(ls -d *.xcworkspace | head -n 1) && xcodebuild -workspace "$WS" -scheme "${WS%.xcworkspace}" -configuration Release -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' ARCHS=arm64 -derivedDataPath build
+                output_path: ios/build/Build/Products/Release-iphonesimulator/*.app
+pr_review:
+    enabled: true
+    build:
+        kind: revyl
+        profile: preview
+    proof_of_changes:
+        enabled: true
+        harness:
+            kind: revyl

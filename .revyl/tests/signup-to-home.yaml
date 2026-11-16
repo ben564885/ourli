@@ -1,0 +1,24 @@
+# Revyl Test Definition
+
+_meta:
+    remote_id: f34b6613-579f-4f96-be32-8604a5477fb4
+    remote_version: 1
+    local_version: 1
+    last_synced_at: "2026-11-15T18:27:58-08:00"
+    checksum: dac3dabd7f4ead80eaaac3ab0e16b72cb35bd9fe74c8cd0472f56dc08c20e542
+test:
+    metadata:
+        name: signup-to-home
+        platform: ios
+        tags:
+            - smoke
+            - onboarding
+    build:
+        name: ourli ios
+    blocks:
+        - type: validation
+          step_description: The ourli onboarding screen is visible with the headline "Let's share your day hour by hour".
+        - type: module_import
+          module: demo-signup
+        - type: validation
+          step_description: Home lists the groups Roommates and College crew, and a Recent Days photo grid.

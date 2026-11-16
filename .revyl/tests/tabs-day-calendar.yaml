@@ -1,0 +1,36 @@
+# Revyl Test Definition
+
+_meta:
+    remote_id: 6901bde9-51ee-49ce-bbff-afc31a59963d
+    remote_version: 1
+    local_version: 1
+    last_synced_at: "2026-11-15T18:28:01-08:00"
+    checksum: ae50eb892edfef66b1f9565e299d1c53e4cb1eb02c07ec8509b60a6cd7a4068c
+test:
+    metadata:
+        name: tabs-day-calendar
+        platform: ios
+        tags:
+            - smoke
+            - navigation
+    build:
+        name: ourli ios
+    blocks:
+        - type: module_import
+          module: demo-signup
+        - type: instructions
+          step_description: Tap the Groups tab (the people icon) in the bottom tab bar.
+        - type: validation
+          step_description: The "Your people" screen lists the groups ourli crew, Roommates and College crew, each with an invite code.
+        - type: instructions
+          step_description: Tap the Roommates group.
+        - type: validation
+          step_description: The Roommates Day screen shows hour tabs and photo slots that say "posted" or "waiting", with a Snap button.
+        - type: instructions
+          step_description: Go back to the tab bar and tap the Calendar tab (the calendar icon, far right).
+        - type: validation
+          step_description: A month calendar is visible with seven weekday columns and photo tiles on past days.
+        - type: instructions
+          step_description: Tap the Creators tab (the crown icon).
+        - type: validation
+          step_description: The "Creator Days" screen is visible with at least one creator card.

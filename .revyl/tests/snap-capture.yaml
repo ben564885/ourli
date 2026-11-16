@@ -1,0 +1,24 @@
+# Revyl Test Definition
+
+_meta:
+    remote_id: a42c5d73-b686-45da-a8b5-6d19427787a8
+    remote_version: 1
+    local_version: 1
+    last_synced_at: "2026-11-15T18:28:05-08:00"
+    checksum: 45dc460cb0c5e82456cf01fc068092ea073350aabaa301f2c494088db52e8329
+test:
+    metadata:
+        name: snap-capture
+        platform: ios
+        tags:
+            - smoke
+            - capture
+    build:
+        name: ourli ios
+    blocks:
+        - type: module_import
+          module: demo-signup
+        - type: instructions
+          step_description: Tap the "Snap to your groups" card on Home.
+        - type: validation
+          step_description: The capture screen is open, showing the hour counter (for example "Hour 3 of 6") and either a camera view or a "Choose a photo" option.

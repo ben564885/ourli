@@ -1,0 +1,15 @@
+blocks:
+  - type: instructions
+    step_description: If the onboarding screen shows "Get started with an invite code", tap it.
+  - type: instructions
+    step_description: Type "OURLI1" into the invite code field.
+  - type: instructions
+    step_description: Type "Revyl" into the "Your name" field.
+  - type: instructions
+    step_description: Tap Continue.
+  - type: validation
+    step_description: The "Upload your photo" screen is visible with a Skip button.
+  - type: instructions
+    step_description: Tap Skip in the top right corner.
+  - type: validation
+    step_description: The Home screen greets the user with "Hi, Revyl" and shows a "Snap to your groups" card.
