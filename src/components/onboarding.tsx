@@ -154,10 +154,7 @@ export function Onboarding() {
         <View style={{ paddingHorizontal: 24, paddingBottom: 12, gap: 6 }}>
           {step === "intro" ? (
             <>
-              <Button testID="get-started" title="Get Started" onPress={() => setStep("name")} />
-              <Pressable onPress={() => setStep("code")} style={{ height: 52, alignItems: "center", justifyContent: "center" }}>
-                <Text style={s.link}>I Have an Invite Code</Text>
-              </Pressable>
+              <Button testID="get-started" title="Get started with an invite code" onPress={() => setStep("code")} />
             </>
           ) : (
             <>
