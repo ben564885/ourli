@@ -144,7 +144,14 @@ export function Onboarding() {
           <View style={{ gap: 12, marginTop: 36, paddingHorizontal: 24 }}>
             <TextInput testID="name-input" placeholder="Your name" placeholderTextColor={C.faint} value={name} onChangeText={setName} style={s.input} autoFocus />
             {step === "code" && (
-              <TextInput testID="onboard-code-input" placeholder="JUDGES USE OURLI1" autoCapitalize="characters" placeholderTextColor={C.faint} value={code} onChangeText={setCode} style={s.input} />
+              <View>
+                <TextInput testID="onboard-code-input" autoCapitalize="characters" value={code} onChangeText={setCode} style={s.input} />
+                {code.length === 0 && (
+                  <Text pointerEvents="none" style={{ position: "absolute", left: 22, top: 0, bottom: 0, textAlignVertical: "center", lineHeight: 56, fontFamily: F.sans, fontSize: 17, color: C.faint }}>
+                    Judges use <Text style={{ fontFamily: F.sansBold, color: C.muted }}>"OURLI1"</Text>
+                  </Text>
+                )}
+              </View>
             )}
           </View>
         )}
