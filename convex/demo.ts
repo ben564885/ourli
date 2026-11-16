@@ -270,11 +270,15 @@ export const joinDemo = mutation({
     const group = await ctx.db.query("groups").withIndex("by_invite", (q) => q.eq("inviteCode", CODE)).unique();
     if (!group) throw new Error("Demo group is not seeded");
     const all = await demoGroups(ctx);
+    const bots = new Set<Id<"users">>();
+    for (const botName of KEEP) {
+      const first = (await ctx.db.query("users").collect()).filter((u) => u.name === botName).sort((a, b) => a._creationTime - b._creationTime)[0];
+      if (first) bots.add(first._id);
+    }
     for (const gr of all) {
       const members = await ctx.db.query("groupMembers").withIndex("by_group", (q) => q.eq("groupId", gr._id)).collect();
       for (const m of members) {
-        const u = await ctx.db.get(m.userId);
-        if (u && KEEP.includes(u.name)) continue;
+        if (bots.has(m.userId)) continue;
         for (const c of await ctx.db.query("captures").filter((q) => q.eq(q.field("userId"), m.userId)).collect()) await ctx.db.delete(c._id);
         await ctx.db.delete(m._id);
       }
