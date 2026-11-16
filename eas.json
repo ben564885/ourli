@@ -10,7 +10,7 @@
         "resourceClass": "m-medium"
       },
       "env": {
-        "EXPO_PUBLIC_WEB_URL": "https://ourli.vercel.app",
+        "EXPO_PUBLIC_WEB_URL": "https://ourli.wasmer.app",
         "EXPO_PUBLIC_CONVEX_URL": "https://zany-cuttlefish-217.convex.cloud",
         "EXPO_PUBLIC_CONVEX_SITE_URL": "https://zany-cuttlefish-217.convex.site"
       }
